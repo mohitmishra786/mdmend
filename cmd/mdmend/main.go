@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/yourhandle/mdmend/internal/config"
 	"github.com/yourhandle/mdmend/internal/fixer"
@@ -215,14 +214,18 @@ func runFixConsole(files []string, cfg *config.Config, opts *fixOptions) error {
 
 		violations := f.Lint(string(content), path)
 		if len(violations) > 0 {
-			cr.Report(path, violations)
+			if err := cr.Report(path, violations); err != nil {
+				fmt.Fprintf(os.Stderr, "Error reporting %s: %v\n", path, err)
+			}
 		}
 
 		if opts.diff {
 			result := f.Fix(string(content), path)
 			if result.Changed {
 				dr := reporter.NewDiffReporter()
-				dr.Diff(path, string(content), result.Content)
+				if err := dr.Diff(path, string(content), result.Content); err != nil {
+					fmt.Fprintf(os.Stderr, "Error generating diff for %s: %v\n", path, err)
+				}
 			}
 		} else {
 			result := f.Fix(string(content), path)
@@ -240,7 +243,9 @@ func runFixConsole(files []string, cfg *config.Config, opts *fixOptions) error {
 		}
 	}
 
-	cr.Summary(len(files), filesChanged, totalViolations)
+	if err := cr.Summary(len(files), filesChanged, totalViolations); err != nil {
+		fmt.Fprintf(os.Stderr, "Error writing summary: %v\n", err)
+	}
 
 	if opts.dryRun && filesChanged > 0 {
 		cr.DryRunNotice()
@@ -285,7 +290,9 @@ func runFixJSON(files []string, cfg *config.Config, opts *fixOptions) error {
 		totalViolations += len(violations)
 
 		if result.Changed && !opts.dryRun {
-			fixer.AtomicWrite(path, []byte(result.Content))
+			if err := fixer.AtomicWrite(path, []byte(result.Content)); err != nil {
+				fmt.Fprintf(os.Stderr, "Error writing %s: %v\n", path, err)
+			}
 		}
 	}
 
@@ -342,13 +349,17 @@ func runLintConsole(files []string, cfg *config.Config, opts *lintOptions) error
 
 		result := l.Lint(string(content), path)
 		if len(result.Violations) > 0 {
-			cr.Report(path, result.Violations)
+			if err := cr.Report(path, result.Violations); err != nil {
+				fmt.Fprintf(os.Stderr, "Error reporting %s: %v\n", path, err)
+			}
 			filesWithIssues++
 			totalViolations += len(result.Violations)
 		}
 	}
 
-	cr.Summary(len(files), filesWithIssues, totalViolations)
+	if err := cr.Summary(len(files), filesWithIssues, totalViolations); err != nil {
+		fmt.Fprintf(os.Stderr, "Error writing summary: %v\n", err)
+	}
 
 	if totalViolations > 0 {
 		os.Exit(1)
@@ -452,7 +463,9 @@ func runSuggest(args []string, opts *suggestOptions) error {
 		result := f.Fix(string(content), path)
 		if result.Changed {
 			fmt.Printf("\n--- %s\n", path)
-			dr.Diff(path, string(content), result.Content)
+			if err := dr.Diff(path, string(content), result.Content); err != nil {
+				fmt.Fprintf(os.Stderr, "Error generating diff for %s: %v\n", path, err)
+			}
 		}
 	}
 
@@ -480,15 +493,4 @@ func loadConfig(opts globalOptions) (*config.Config, error) {
 	}
 
 	return cfg, nil
-}
-
-func colorPrint(noColor bool) func(format string, a ...interface{}) string {
-	if noColor {
-		return func(format string, a ...interface{}) string {
-			return fmt.Sprintf(format, a...)
-		}
-	}
-	return func(format string, a ...interface{}) string {
-		return color.CyanString(format, a...)
-	}
 }

@@ -121,7 +121,6 @@ func (r *MD031) Description() string { return "Fenced code blocks should be surr
 func (r *MD031) Fixable() bool       { return true }
 
 var codeFenceStartRegex = regexp.MustCompile("^(`{3,}|~{3,})")
-var codeFenceEndRegex = regexp.MustCompile("^(`{3,}|~{3,})\\s*$")
 
 func (r *MD031) Lint(content string, path string) []Violation {
 	var violations []Violation

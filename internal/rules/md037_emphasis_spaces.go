@@ -17,7 +17,6 @@ func (r *MD037) Description() string { return "Spaces inside emphasis markers" }
 func (r *MD037) Fixable() bool       { return true }
 
 var emphasisSpaceRegex = regexp.MustCompile(`(\*|_)( +)([^*_]+?)( +)(\*|_)`)
-var emphasisSpaceRegex2 = regexp.MustCompile(`(\*{1,2}|_{1,2})( +)(\S)`)
 
 func (r *MD037) Lint(content string, path string) []Violation {
 	var violations []Violation

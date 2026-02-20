@@ -1,7 +1,6 @@
 package rules
 
 import (
-	"regexp"
 	"strings"
 )
 
@@ -15,10 +14,6 @@ func (r *MD055) ID() string          { return "MD055" }
 func (r *MD055) Name() string        { return "table-pipe-style" }
 func (r *MD055) Description() string { return "Table pipe style" }
 func (r *MD055) Fixable() bool       { return true }
-
-var tableRowRegex = regexp.MustCompile(`^\|(.+)\|$`)
-var tableRowNoStartRegex = regexp.MustCompile(`^([^|].+)\|$`)
-var tableRowNoEndRegex = regexp.MustCompile(`^\|(.+)[^|]$`)
 
 func (r *MD055) Lint(content string, path string) []Violation {
 	var violations []Violation

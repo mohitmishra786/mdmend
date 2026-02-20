@@ -98,8 +98,6 @@ func (r *MD049) Name() string        { return "emphasis-style" }
 func (r *MD049) Description() string { return "Emphasis style should be consistent" }
 func (r *MD049) Fixable() bool       { return true }
 
-var emphasisRegex = regexp.MustCompile(`(_)([^_]+)(_)|(\*)([^*]+)(\*)`)
-
 func (r *MD049) Lint(content string, path string) []Violation {
 	var violations []Violation
 	lines := strings.Split(content, "\n")
@@ -181,8 +179,6 @@ func (r *MD050) Name() string        { return "strong-style" }
 func (r *MD050) Description() string { return "Strong style should be consistent" }
 func (r *MD050) Fixable() bool       { return true }
 
-var strongRegex = regexp.MustCompile(`(__)([^_]+)(__)|(\*\*)([^*]+)(\*\*)`)
-
 func (r *MD050) Lint(content string, path string) []Violation {
 	var violations []Violation
 	lines := strings.Split(content, "\n")
@@ -252,8 +248,6 @@ func (r *MD053) Fixable() bool       { return true }
 var linkRefDefRegex = regexp.MustCompile(`^\[([^\]]+)\]:\s*(.+)$`)
 var linkRefUsageRegex = regexp.MustCompile(`\[([^\]]*)\]\[([^\]]*)\]`)
 var imageRefUsageRegex = regexp.MustCompile(`!\[([^\]]*)\]\[([^\]]*)\]`)
-var inlineLinkRegex = regexp.MustCompile(`\[([^\]]*)\]\(([^)]*)\)`)
-var inlineImageRegex = regexp.MustCompile(`!\[([^\]]*)\]\(([^)]*)\)`)
 
 func (r *MD053) Lint(content string, path string) []Violation {
 	var violations []Violation
@@ -328,7 +322,7 @@ func (r *MD053) Fix(content string, path string) FixResult {
 
 	var result []string
 	changed := false
-	for i, line := range lines {
+	for _, line := range lines {
 		if matches := linkRefDefRegex.FindStringSubmatch(line); len(matches) > 0 {
 			label := strings.ToLower(matches[1])
 			if !usedRefs[label] {
@@ -337,8 +331,6 @@ func (r *MD053) Fix(content string, path string) FixResult {
 			}
 		}
 		result = append(result, line)
-		if i < len(lines)-1 {
-		}
 	}
 
 	return FixResult{Changed: changed, Lines: result}

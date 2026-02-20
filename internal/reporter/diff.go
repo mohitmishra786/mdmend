@@ -51,11 +51,6 @@ func (r *DiffReporter) Diff(path string, original, fixed string) error {
 	lines := strings.Split(original, "\n")
 	fixedLines := strings.Split(fixed, "\n")
 
-	maxLines := len(lines)
-	if len(fixedLines) > maxLines {
-		maxLines = len(fixedLines)
-	}
-
 	origIdx := 0
 	fixedIdx := 0
 
@@ -132,6 +127,6 @@ func (r *DiffReporter) ReportViolations(path string, violations []rules.Violatio
 func FormatUnifiedDiff(path, original, fixed string) string {
 	var sb strings.Builder
 	dr := NewDiffReporterWithWriter(&sb)
-	dr.Diff(path, original, fixed)
+	_ = dr.Diff(path, original, fixed)
 	return sb.String()
 }
