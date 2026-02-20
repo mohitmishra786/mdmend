@@ -4,11 +4,11 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/yourhandle/mdmend/internal/config"
-	"github.com/yourhandle/mdmend/internal/fixer"
-	"github.com/yourhandle/mdmend/internal/linter"
-	"github.com/yourhandle/mdmend/internal/reporter"
-	"github.com/yourhandle/mdmend/internal/walker"
+	"github.com/mohitmishra786/mdmend/internal/config"
+	"github.com/mohitmishra786/mdmend/internal/fixer"
+	"github.com/mohitmishra786/mdmend/internal/linter"
+	"github.com/mohitmishra786/mdmend/internal/reporter"
+	"github.com/mohitmishra786/mdmend/internal/walker"
 )
 
 type Options struct {

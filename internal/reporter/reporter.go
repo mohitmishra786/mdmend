@@ -1,6 +1,6 @@
 package reporter
 
-import "github.com/yourhandle/mdmend/internal/rules"
+import "github.com/mohitmishra786/mdmend/internal/rules"
 
 type Reporter interface {
 	Report(path string, violations []rules.Violation) error

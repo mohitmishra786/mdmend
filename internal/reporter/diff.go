@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
-	"github.com/yourhandle/mdmend/internal/rules"
+	"github.com/mohitmishra786/mdmend/internal/rules"
 )
 
 type DiffReporter struct {

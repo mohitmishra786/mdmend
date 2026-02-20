@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/yourhandle/mdmend/internal/rules"
+	"github.com/mohitmishra786/mdmend/internal/rules"
 )
 
 type ConsoleReporter struct {

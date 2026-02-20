@@ -47,11 +47,11 @@ changelog:
 
 brews:
   - name: mdmend
-    homepage: "https://github.com/yourhandle/mdmend"
+    homepage: "https://github.com/mohitmishra786/mdmend"
     description: "Fix Markdown lint violations across all files, instantly."
     license: "MIT"
     repository:
-      owner: yourhandle
+      owner: mohitmishra786
       name: homebrew-tap
       branch: main
     commit_author:
@@ -65,7 +65,7 @@ brews:
 
 nfpms:
   - file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    homepage: https://github.com/yourhandle/mdmend
+    homepage: https://github.com/mohitmishra786/mdmend
     description: "Fix Markdown lint violations across all files, instantly."
     license: MIT
     formats:
@@ -75,18 +75,18 @@ nfpms:
 
 scoops:
   - repository:
-      owner: yourhandle
+      owner: mohitmishra786
       name: scoop-bucket
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
-    homepage: https://github.com/yourhandle/mdmend
+    homepage: https://github.com/mohitmishra786/mdmend
     description: "Fix Markdown lint violations across all files, instantly."
     license: MIT
 
 release:
   github:
-    owner: yourhandle
+    owner: mohitmishra786
     name: mdmend
   draft: false
   prerelease: auto
@@ -96,4 +96,4 @@ release:
     
     Mend your Markdown. Instantly.
   footer: |
-    **Full Changelog**: https://github.com/yourhandle/mdmend/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full Changelog**: https://github.com/mohitmishra786/mdmend/compare/{{ .PreviousTag }}...{{ .Tag }}

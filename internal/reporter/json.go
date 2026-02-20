@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/yourhandle/mdmend/internal/rules"
+	"github.com/mohitmishra786/mdmend/internal/rules"
 )
 
 type JSONReporter struct {

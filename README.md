@@ -18,23 +18,23 @@
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew install yourhandle/tap/mdmend
+brew install mohitmishra786/tap/mdmend
 ```
 
 ### Go
 
 ```bash
-go install github.com/yourhandle/mdmend/cmd/mdmend@latest
+go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest
 ```
 
 ### Direct Download
 
-Download the latest release from [GitHub Releases](https://github.com/yourhandle/mdmend/releases).
+Download the latest release from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases).
 
 ### From Source
 
 ```bash
-git clone https://github.com/yourhandle/mdmend.git
+git clone https://github.com/mohitmishra786/mdmend.git
 cd mdmend
 make install
 ```
@@ -247,7 +247,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: yourhandle/mdmend-action@v1
+      - uses: mohitmishra786/mdmend-action@v1
         with:
           args: lint "**/*.md"
 ```
@@ -273,7 +273,7 @@ mdmend lint . --rules ~MD013,~MD033 || exit 1
 
 ```bash
 # Clone and build
-git clone https://github.com/yourhandle/mdmend.git
+git clone https://github.com/mohitmishra786/mdmend.git
 cd mdmend
 make build
 

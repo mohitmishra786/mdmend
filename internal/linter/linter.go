@@ -3,8 +3,8 @@ package linter
 import (
 	"sort"
 
-	"github.com/yourhandle/mdmend/internal/config"
-	"github.com/yourhandle/mdmend/internal/rules"
+	"github.com/mohitmishra786/mdmend/internal/config"
+	"github.com/mohitmishra786/mdmend/internal/rules"
 )
 
 type Linter struct {

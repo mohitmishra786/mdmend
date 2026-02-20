@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/yourhandle/mdmend/internal/inferrer"
+	"github.com/mohitmishra786/mdmend/internal/inferrer"
 )
 
 type MD040 struct {

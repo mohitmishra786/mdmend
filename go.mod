@@ -1,4 +1,4 @@
-module github.com/yourhandle/mdmend
+module github.com/mohitmishra786/mdmend
 
 go 1.22
 
