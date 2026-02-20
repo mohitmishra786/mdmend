@@ -1,0 +1,99 @@
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    binary: mdmend
+    main: ./cmd/mdmend
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+      - .mdmend.yml
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - Merge pull request
+      - Merge branch
+
+brews:
+  - name: mdmend
+    homepage: "https://github.com/yourhandle/mdmend"
+    description: "Fix Markdown lint violations across all files, instantly."
+    license: "MIT"
+    repository:
+      owner: yourhandle
+      name: homebrew-tap
+      branch: main
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    directory: Formula
+    test: |
+      system "#{bin}/mdmend --version"
+    install: |
+      bin.install "mdmend"
+
+nfpms:
+  - file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    homepage: https://github.com/yourhandle/mdmend
+    description: "Fix Markdown lint violations across all files, instantly."
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    maintainer: Your Name <your@email.com>
+
+scoops:
+  - repository:
+      owner: yourhandle
+      name: scoop-bucket
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    homepage: https://github.com/yourhandle/mdmend
+    description: "Fix Markdown lint violations across all files, instantly."
+    license: MIT
+
+release:
+  github:
+    owner: yourhandle
+    name: mdmend
+  draft: false
+  prerelease: auto
+  mode: replace
+  header: |
+    ## mdmend {{.Version}}
+    
+    Mend your Markdown. Instantly.
+  footer: |
+    **Full Changelog**: https://github.com/yourhandle/mdmend/compare/{{ .PreviousTag }}...{{ .Tag }}

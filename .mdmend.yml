@@ -1,0 +1,54 @@
+# mdmend configuration
+
+# Rules to disable entirely
+disable:
+  - MD013   # line length — let Prettier/formatters handle it
+  - MD033   # inline HTML — often intentional in docs
+
+# Rule-specific configuration
+rules:
+  MD010:
+    tab_size: 4          # spaces to replace tabs with
+  
+  MD026:
+    punctuation: ".,;:!" # which trailing chars to strip from headings
+  
+  MD034:
+    style: angle         # angle (wrap in <>) | link (convert to [url](url))
+    skip_patterns:       # don't wrap URLs matching these
+      - "example\\.com"
+      - "localhost"
+  
+  MD040:
+    fallback: text       # language to use when inference fails
+    confidence: 0.6      # minimum confidence to apply without --aggressive
+  
+  MD044:
+    names:               # proper names to enforce capitalization
+      - JavaScript
+      - TypeScript
+      - GitHub
+      - macOS
+      - Linux
+      - Windows
+      - Docker
+      - Kubernetes
+      - Go
+      - Python
+      - Rust
+  
+  MD048:
+    style: backtick      # backtick | tilde
+
+# Files/dirs to ignore (gitignore syntax)
+ignore:
+  - node_modules/
+  - vendor/
+  - "*.generated.md"
+  - CHANGELOG.md
+  - dist/
+  - build/
+
+# Global settings
+tab_size: 4
+aggressive: false        # apply heuristic fixes without prompting

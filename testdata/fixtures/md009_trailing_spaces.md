@@ -1,0 +1,4 @@
+# Trailing Spaces Test
+
+This line has trailing spaces    
+And this one too	
