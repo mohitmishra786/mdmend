@@ -145,6 +145,25 @@ func TestPatcherApply(t *testing.T) {
 	}
 }
 
+func TestPatcherApplyNestedDir(t *testing.T) {
+	tmpDir := t.TempDir()
+	path := filepath.Join(tmpDir, "nested", "dir", "test.md")
+
+	patcher := NewPatcher(path)
+	if err := patcher.Apply("nested content"); err != nil {
+		t.Fatalf("Apply() error = %v", err)
+	}
+
+	read, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile() error = %v", err)
+	}
+
+	if string(read) != "nested content" {
+		t.Errorf("Read content = %q, want nested content", read)
+	}
+}
+
 func TestApplyFixes(t *testing.T) {
 	cfg := config.Default()
 	content := "#Heading\n"
@@ -167,5 +186,29 @@ func TestDryRun(t *testing.T) {
 	}
 	if len(violations) == 0 {
 		t.Error("DryRun() should return violations")
+	}
+}
+
+func TestFixWithNoChange(t *testing.T) {
+	cfg := config.Default()
+	content := "# Heading\n\nParagraph.\n"
+	result := ApplyFixes(content, "test.md", cfg)
+
+	if result.Changed {
+		t.Error("ApplyFixes() should not change clean content")
+	}
+}
+
+func TestFixWithFixes(t *testing.T) {
+	cfg := config.Default()
+	content := "#Heading\n"
+
+	result := ApplyFixes(content, "test.md", cfg)
+
+	if !result.Changed {
+		t.Error("ApplyFixes() should change content")
+	}
+	if result.Fixes == 0 {
+		t.Error("ApplyFixes() should count fixes")
 	}
 }

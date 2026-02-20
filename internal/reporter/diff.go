@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/mohitmishra786/mdmend/internal/rules"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 type DiffReporter struct {
@@ -42,8 +42,8 @@ func (r *DiffReporter) Diff(path string, original, fixed string) error {
 		return nil
 	}
 
-	fmt.Fprintf(r.writer, "--- %s\n", path)
-	fmt.Fprintf(r.writer, "+++ %s\n", path)
+	_, _ = fmt.Fprintf(r.writer, "--- %s\n", path)
+	_, _ = fmt.Fprintf(r.writer, "+++ %s\n", path)
 
 	delta := dmp.DiffToDelta(diffs)
 	_ = delta
@@ -92,12 +92,12 @@ func (r *DiffReporter) Diff(path string, original, fixed string) error {
 		}
 
 		if hasDiff {
-			fmt.Fprintf(r.writer, "@@ -%d,%d +%d,%d @@\n", startLine, len(chunkOrig), startLine, len(chunkFixed))
+			_, _ = fmt.Fprintf(r.writer, "@@ -%d,%d +%d,%d @@\n", startLine, len(chunkOrig), startLine, len(chunkFixed))
 			for _, line := range chunkOrig {
-				fmt.Fprintf(r.writer, "-%s\n", line)
+				_, _ = fmt.Fprintf(r.writer, "-%s\n", line)
 			}
 			for _, line := range chunkFixed {
-				fmt.Fprintf(r.writer, "+%s\n", line)
+				_, _ = fmt.Fprintf(r.writer, "+%s\n", line)
 			}
 		}
 	}
@@ -110,14 +110,14 @@ func (r *DiffReporter) ReportViolations(path string, violations []rules.Violatio
 		return nil
 	}
 
-	fmt.Fprintf(r.writer, "--- %s (violations)\n", path)
-	fmt.Fprintf(r.writer, "+++ %s (suggested)\n", path)
+	_, _ = fmt.Fprintf(r.writer, "--- %s (violations)\n", path)
+	_, _ = fmt.Fprintf(r.writer, "+++ %s (suggested)\n", path)
 
 	for _, v := range violations {
-		fmt.Fprintf(r.writer, "@@ %d:%d @@\n", v.Line, v.Column)
-		fmt.Fprintf(r.writer, "- %s\n", v.Message)
+		_, _ = fmt.Fprintf(r.writer, "@@ %d:%d @@\n", v.Line, v.Column)
+		_, _ = fmt.Fprintf(r.writer, "- %s\n", v.Message)
 		if v.Suggested != "" {
-			fmt.Fprintf(r.writer, "+ %s\n", v.Suggested)
+			_, _ = fmt.Fprintf(r.writer, "+ %s\n", v.Suggested)
 		}
 	}
 

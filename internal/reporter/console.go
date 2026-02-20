@@ -45,7 +45,7 @@ func (r *ConsoleReporter) Report(path string, violations []rules.Violation) erro
 		white = func(a ...interface{}) string { return fmt.Sprint(a...) }
 	}
 
-	fmt.Fprintf(r.writer, "\n  %s\n", cyan(path))
+	_, _ = fmt.Fprintf(r.writer, "\n  %s\n", cyan(path))
 
 	for _, v := range violations {
 		location := fmt.Sprintf("%d:%d", v.Line, v.Column)
@@ -61,7 +61,7 @@ func (r *ConsoleReporter) Report(path string, violations []rules.Violation) erro
 			msg = fmt.Sprintf("%s → %s", v.Message, white(v.Suggested))
 		}
 
-		fmt.Fprintf(r.writer, "    %s %s:%s  %s\n", symbol, v.Rule, yellow(location), msg)
+		_, _ = fmt.Fprintf(r.writer, "    %s %s:%s  %s\n", symbol, v.Rule, yellow(location), msg)
 	}
 
 	return nil
@@ -75,12 +75,12 @@ func (r *ConsoleReporter) Summary(totalFiles, filesWithIssues, totalViolations i
 		yellow = func(a ...interface{}) string { return fmt.Sprint(a...) }
 	}
 
-	fmt.Fprintf(r.writer, "\n  %s\n", strings.Repeat("─", 45))
+	_, _ = fmt.Fprintf(r.writer, "\n  %s\n", strings.Repeat("─", 45))
 
 	if totalViolations == 0 {
-		fmt.Fprintf(r.writer, "  %s files scanned · %s\n", green(fmt.Sprintf("%d", totalFiles)), green("no issues found"))
+		_, _ = fmt.Fprintf(r.writer, "  %s files scanned · %s\n", green(fmt.Sprintf("%d", totalFiles)), green("no issues found"))
 	} else {
-		fmt.Fprintf(r.writer, "  %d files scanned · %s · %d violations\n",
+		_, _ = fmt.Fprintf(r.writer, "  %d files scanned · %s · %d violations\n",
 			totalFiles,
 			yellow(fmt.Sprintf("%d files with issues", filesWithIssues)),
 			totalViolations)
@@ -94,7 +94,7 @@ func (r *ConsoleReporter) DryRunNotice() {
 	if r.noColor {
 		yellow = func(a ...interface{}) string { return fmt.Sprint(a...) }
 	}
-	fmt.Fprintf(r.writer, "\n  %s\n", yellow("Dry run — no files written. Run without --dry-run to apply."))
+	_, _ = fmt.Fprintf(r.writer, "\n  %s\n", yellow("Dry run — no files written. Run without --dry-run to apply."))
 }
 
 func (r *ConsoleReporter) PrintHeader(version string, fileCount int, workerCount int) {
@@ -102,5 +102,5 @@ func (r *ConsoleReporter) PrintHeader(version string, fileCount int, workerCount
 	if r.noColor {
 		cyan = func(a ...interface{}) string { return fmt.Sprint(a...) }
 	}
-	fmt.Fprintf(r.writer, "\n  %s v%s — scanning %d files with %d workers\n\n", cyan("mdmend"), version, fileCount, workerCount)
+	_, _ = fmt.Fprintf(r.writer, "\n  %s v%s — scanning %d files with %d workers\n\n", cyan("mdmend"), version, fileCount, workerCount)
 }

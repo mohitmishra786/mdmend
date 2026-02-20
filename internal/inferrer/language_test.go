@@ -36,6 +36,18 @@ func TestInferFromShebang(t *testing.T) {
 			wantConf: 0.95,
 		},
 		{
+			name:     "perl shebang",
+			content:  []string{"#!/usr/bin/perl", "print 'hello'"},
+			wantLang: "perl",
+			wantConf: 0.95,
+		},
+		{
+			name:     "sh shebang",
+			content:  []string{"#!/bin/sh", "echo hello"},
+			wantLang: "bash",
+			wantConf: 0.95,
+		},
+		{
 			name:     "no shebang returns empty",
 			content:  []string{"some random text"},
 			wantLang: "",
@@ -44,6 +56,12 @@ func TestInferFromShebang(t *testing.T) {
 		{
 			name:     "empty content",
 			content:  []string{},
+			wantLang: "",
+			wantConf: 0,
+		},
+		{
+			name:     "unknown shebang",
+			content:  []string{"#!/usr/bin/unknown", "code"},
 			wantLang: "",
 			wantConf: 0,
 		},
@@ -105,6 +123,66 @@ func TestInferFromContent(t *testing.T) {
 			content:  []string{"fn main() {", "    println!(\"hello\");", "}"},
 			wantLang: "rust",
 		},
+		{
+			name:     "css content",
+			content:  []string{".class {", "  color: red;", "}"},
+			wantLang: "css",
+		},
+		{
+			name:     "diff content",
+			content:  []string{"+++ newfile", "--- oldfile", "@@ line @@"},
+			wantLang: "diff",
+		},
+		{
+			name:     "diff content",
+			content:  []string{"+++ newfile", "--- oldfile", "@@ line @@"},
+			wantLang: "diff",
+		},
+		{
+			name:     "makefile content",
+			content:  []string{"all: build", ".PHONY: all"},
+			wantLang: "makefile",
+		},
+		{
+			name:     "ruby content",
+			content:  []string{"require 'json'", "class Foo", "end"},
+			wantLang: "ruby",
+		},
+		{
+			name:     "java content",
+			content:  []string{"package com.example;", "public class Main {}"},
+			wantLang: "java",
+		},
+		{
+			name:     "c content",
+			content:  []string{"#include <stdio.h>", "int main() {}"},
+			wantLang: "c",
+		},
+		{
+			name:     "cpp content",
+			content:  []string{"#include <iostream>", "using namespace std;"},
+			wantLang: "cpp",
+		},
+		{
+			name:     "bash with multiple patterns",
+			content:  []string{"#!/bin/bash", "apt update", "brew install x", "npm install", "pip install", "git clone", "curl url", "wget url", "echo done", "export VAR", "source file"},
+			wantLang: "bash",
+		},
+		{
+			name:     "typescript content",
+			content:  []string{"interface User {", "  name: string", "}", "const x: number = 1"},
+			wantLang: "typescript",
+		},
+		{
+			name:     "html content",
+			content:  []string{"<!DOCTYPE html>", "<html>", "</html>"},
+			wantLang: "html",
+		},
+		{
+			name:     "xml content",
+			content:  []string{"<?xml version=\"1.0\"?>", "<root></root>"},
+			wantLang: "xml",
+		},
 	}
 
 	for _, tt := range tests {
@@ -162,10 +240,52 @@ func TestInferFromFileMention(t *testing.T) {
 		wantLang string
 	}{
 		{
-			name:     "yml file mention",
-			content:  []string{"key: value"},
-			context:  []string{"Save as config.yml:", "```"},
-			wantLang: "yaml",
+			name:     "json file mention",
+			content:  []string{"{}"},
+			context:  []string{"Save as package.json:", "```"},
+			wantLang: "json",
+		},
+		{
+			name:     "json file mention",
+			content:  []string{"{}"},
+			context:  []string{"Save as package.json:", "```"},
+			wantLang: "json",
+		},
+		{
+			name:     "dockerfile mention",
+			content:  []string{"FROM alpine"},
+			context:  []string{"Create a Dockerfile:", "```"},
+			wantLang: "dockerfile",
+		},
+		{
+			name:     "makefile mention",
+			content:  []string{".PHONY: all", "all: build"},
+			context:  []string{"Create a Makefile:", "```"},
+			wantLang: "makefile",
+		},
+		{
+			name:     "pipfile mention",
+			content:  []string{"[[source]]", "url = \"pypi\""},
+			context:  []string{"Save as Pipfile:", "```"},
+			wantLang: "json",
+		},
+		{
+			name:     "gemfile mention",
+			content:  []string{"gem 'rails'"},
+			context:  []string{"Create a Gemfile:", "```"},
+			wantLang: "ruby",
+		},
+		{
+			name:     "ts file mention",
+			content:  []string{"interface Foo {}"},
+			context:  []string{"Save as app.ts:", "```"},
+			wantLang: "typescript",
+		},
+		{
+			name:     "go file mention",
+			content:  []string{"package main"},
+			context:  []string{"Save as main.go:", "```"},
+			wantLang: "go",
 		},
 	}
 

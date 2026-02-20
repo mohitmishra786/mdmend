@@ -27,7 +27,7 @@ func (p *Patcher) Apply(content string) error {
 	}
 
 	if err := os.Rename(tmpPath, p.path); err != nil {
-		os.Remove(tmpPath)
+		_ = os.Remove(tmpPath)
 		return err
 	}
 

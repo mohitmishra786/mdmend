@@ -218,3 +218,96 @@ func TestFormatUnifiedDiff(t *testing.T) {
 		t.Error("FormatUnifiedDiff() should return diff output")
 	}
 }
+
+func TestDiffReporterReport(t *testing.T) {
+	var buf bytes.Buffer
+	dr := NewDiffReporterWithWriter(&buf)
+
+	violations := []rules.Violation{
+		{Rule: "MD010", Line: 1, Column: 1, Message: "Hard tab", Fixable: true},
+	}
+
+	if err := dr.Report("test.md", violations); err != nil {
+		t.Fatalf("Report() error = %v", err)
+	}
+}
+
+func TestDiffReporterSummary(t *testing.T) {
+	var buf bytes.Buffer
+	dr := NewDiffReporterWithWriter(&buf)
+
+	if err := dr.Summary(10, 5, 15); err != nil {
+		t.Fatalf("Summary() error = %v", err)
+	}
+}
+
+func TestJSONReporterReport(t *testing.T) {
+	jr := NewJSONReporter()
+
+	violations := []rules.Violation{
+		{Rule: "MD010", Line: 1, Column: 1, Message: "Hard tab", Fixable: true},
+	}
+
+	if err := jr.Report("test.md", violations); err != nil {
+		t.Fatalf("Report() error = %v", err)
+	}
+}
+
+func TestJSONReporterSummary(t *testing.T) {
+	jr := NewJSONReporter()
+
+	if err := jr.Summary(10, 5, 15); err != nil {
+		t.Fatalf("Summary() error = %v", err)
+	}
+}
+
+func TestConsoleReporterReportWithColor(t *testing.T) {
+	var buf bytes.Buffer
+	cr := NewConsoleReporterWithWriter(&buf, false)
+
+	violations := []rules.Violation{
+		{Rule: "MD010", Line: 1, Column: 1, Message: "Hard tab", Fixable: true},
+	}
+
+	if err := cr.Report("test.md", violations); err != nil {
+		t.Fatalf("Report() error = %v", err)
+	}
+
+	if buf.Len() == 0 {
+		t.Error("Report() should write output")
+	}
+}
+
+func TestConsoleReporterReportUnfixable(t *testing.T) {
+	var buf bytes.Buffer
+	cr := NewConsoleReporterWithWriter(&buf, true)
+
+	violations := []rules.Violation{
+		{Rule: "MD013", Line: 1, Column: 1, Message: "Line too long", Fixable: false},
+	}
+
+	if err := cr.Report("test.md", violations); err != nil {
+		t.Fatalf("Report() error = %v", err)
+	}
+
+	if buf.Len() == 0 {
+		t.Error("Report() should write output")
+	}
+}
+
+func TestConsoleReporterReportWithSuggestion(t *testing.T) {
+	var buf bytes.Buffer
+	cr := NewConsoleReporterWithWriter(&buf, true)
+
+	violations := []rules.Violation{
+		{Rule: "MD010", Line: 1, Column: 1, Message: "Hard tab", Fixable: true, Suggested: "Use spaces"},
+	}
+
+	if err := cr.Report("test.md", violations); err != nil {
+		t.Fatalf("Report() error = %v", err)
+	}
+
+	if buf.Len() == 0 {
+		t.Error("Report() should write output")
+	}
+}

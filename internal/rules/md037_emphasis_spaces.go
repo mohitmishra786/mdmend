@@ -67,7 +67,7 @@ func (r *MD038) Lint(content string, path string) []Violation {
 	for i, line := range lines {
 		matches := codeSpanRegex.FindAllStringSubmatchIndex(line, -1)
 		for _, match := range matches {
-			if len(match) >= 6 {
+			if len(match) >= 4 {
 				codeContent := line[match[2]:match[3]]
 				if len(codeContent) > 0 && (codeContent[0] == ' ' || codeContent[len(codeContent)-1] == ' ') {
 					trimmed := strings.TrimSpace(codeContent)

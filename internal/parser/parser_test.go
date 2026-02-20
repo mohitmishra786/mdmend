@@ -63,6 +63,32 @@ func TestSourceFileInsertLine(t *testing.T) {
 	}
 }
 
+func TestSourceFileInsertLineEdgeCases(t *testing.T) {
+	t.Run("negative line number", func(t *testing.T) {
+		sf := NewSourceFile("test.md", []byte("line1\nline2"))
+		sf.InsertLine(-1, "new")
+		if sf.GetLine(1) != "new" {
+			t.Errorf("InsertLine(-1) should insert at line 1, got %q", sf.GetLine(1))
+		}
+	})
+
+	t.Run("zero line number", func(t *testing.T) {
+		sf := NewSourceFile("test.md", []byte("line1\nline2"))
+		sf.InsertLine(0, "new")
+		if sf.GetLine(1) != "new" {
+			t.Errorf("InsertLine(0) should insert at line 1, got %q", sf.GetLine(1))
+		}
+	})
+
+	t.Run("line number beyond end", func(t *testing.T) {
+		sf := NewSourceFile("test.md", []byte("line1\nline2"))
+		sf.InsertLine(100, "new")
+		if sf.GetLine(3) != "new" {
+			t.Errorf("InsertLine(100) should append at end, got %q at line 3", sf.GetLine(3))
+		}
+	})
+}
+
 func TestSourceFileDeleteLine(t *testing.T) {
 	content := []byte("line1\nline2\nline3")
 	sf := NewSourceFile("test.md", content)

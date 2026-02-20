@@ -211,3 +211,99 @@ func TestStartsWith(t *testing.T) {
 		t.Error("startsWith should return false when prefix is longer")
 	}
 }
+
+func TestLoadJSON(t *testing.T) {
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, ".markdownlint.json")
+
+	content := `{"disable": ["MD013"], "tab_size": 2}`
+	if err := os.WriteFile(configPath, []byte(content), 0644); err != nil {
+		t.Fatalf("Failed to write config file: %v", err)
+	}
+
+	cfg, err := Load(configPath)
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+
+	if cfg == nil {
+		t.Fatal("Load() returned nil config")
+	}
+}
+
+func TestLoadIgnorePatterns(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	ignoreContent := `# Comment
+node_modules/
+*.log
+`
+	ignorePath := filepath.Join(tmpDir, ".mdmendignore")
+	if err := os.WriteFile(ignorePath, []byte(ignoreContent), 0644); err != nil {
+		t.Fatalf("Failed to write ignore file: %v", err)
+	}
+
+	patterns, err := LoadIgnorePatterns(tmpDir)
+	if err != nil {
+		t.Fatalf("LoadIgnorePatterns() error = %v", err)
+	}
+
+	if len(patterns) != 2 {
+		t.Errorf("LoadIgnorePatterns() got %d patterns, want 2", len(patterns))
+	}
+}
+
+func TestLoadIgnorePatternsNoFile(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	patterns, err := LoadIgnorePatterns(tmpDir)
+	if err != nil {
+		t.Fatalf("LoadIgnorePatterns() error = %v", err)
+	}
+
+	if len(patterns) != 0 {
+		t.Errorf("LoadIgnorePatterns() should return empty slice when no ignore files exist")
+	}
+}
+
+func TestLoadPathDiscovery(t *testing.T) {
+	oldWd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tmpDir := t.TempDir()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = os.Chdir(oldWd) }()
+
+	configContent := `disable: ["MD013"]`
+	if err := os.WriteFile(".mdmend.yml", []byte(configContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err := Load("")
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+
+	if !cfg.IsDisabled("MD013") {
+		t.Error("MD013 should be disabled from discovered config")
+	}
+}
+
+func TestLoadYAMLError(t *testing.T) {
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, ".mdmend.yml")
+
+	content := `invalid: [yaml: syntax`
+	if err := os.WriteFile(configPath, []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err := Load(configPath)
+	if err == nil {
+		t.Error("Load() should return error for invalid YAML")
+	}
+}
