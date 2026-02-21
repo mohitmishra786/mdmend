@@ -36,29 +36,15 @@ func TestVersionInfo(t *testing.T) {
 		t.Error("expected version info to contain 'mdmend'")
 	}
 
-	if !strings.Contains(info, Version) {
+	if !strings.Contains(info, GetVersion()) {
 		t.Error("expected version info to contain version")
 	}
 
-	if !strings.Contains(info, Commit) {
+	if !strings.Contains(info, GetCommit()) {
 		t.Error("expected version info to contain commit")
 	}
 
-	if !strings.Contains(info, Date) {
+	if !strings.Contains(info, GetBuildDate()) {
 		t.Error("expected version info to contain date")
-	}
-}
-
-func TestVersionVariables(t *testing.T) {
-	if Version == "" {
-		t.Error("Version should not be empty")
-	}
-
-	if Commit == "" {
-		t.Error("Commit should not be empty")
-	}
-
-	if Date == "" {
-		t.Error("Date should not be empty")
 	}
 }

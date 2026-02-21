@@ -1,23 +1,23 @@
 package mdmend
 
 var (
-	Version = "dev"
-	Commit  = "none"
-	Date    = "unknown"
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 func GetVersion() string {
-	return Version
+	return version
 }
 
 func GetCommit() string {
-	return Commit
+	return commit
 }
 
 func GetBuildDate() string {
-	return Date
+	return date
 }
 
 func VersionInfo() string {
-	return "mdmend " + Version + " (commit: " + Commit + ", built: " + Date + ")"
+	return "mdmend " + version + " (commit: " + commit + ", built: " + date + ")"
 }

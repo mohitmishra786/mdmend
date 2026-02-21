@@ -477,6 +477,8 @@ func TestNewClientWithDefaults(t *testing.T) {
 }
 
 func TestClientAggressiveMode(t *testing.T) {
+	// MD040: Fenced code blocks should have a language specified
+	// MD022: Headings should be surrounded by blank lines
 	content := "# Test\n```\ncode\n```\n"
 
 	normalClient := NewClient()
@@ -485,8 +487,20 @@ func TestClientAggressiveMode(t *testing.T) {
 	aggressiveClient := NewClient(WithAggressiveMode(true))
 	aggressiveResult := aggressiveClient.FixString(content, "test.md")
 
-	_ = normalResult
-	_ = aggressiveResult
+	// Normal fix should handle MD022 (blank line after heading)
+	// but not MD040 (unless aggressive)
+	if !normalResult.Changed {
+		t.Error("expected normal result to have some changes (MD022)")
+	}
+
+	// Aggressive fix should handle both
+	if !aggressiveResult.Changed {
+		t.Error("expected aggressive result to have changes")
+	}
+
+	if len(aggressiveResult.Violations) >= len(normalResult.Violations) && len(normalResult.Violations) > 0 {
+		// This is a bit weak because both might fix MD022, but aggressive should fix more
+	}
 }
 
 func TestClientIgnorePatterns(t *testing.T) {

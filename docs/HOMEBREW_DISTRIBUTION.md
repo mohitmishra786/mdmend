@@ -319,7 +319,7 @@ jobs:
       
       - name: Set up Homebrew
         id: setup-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@v1
       
       - name: Install formula
         run: brew install --build-from-source Formula/mdmend.rb

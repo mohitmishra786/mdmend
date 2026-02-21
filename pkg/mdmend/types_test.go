@@ -1,6 +1,7 @@
 package mdmend
 
 import (
+	"strconv"
 	"testing"
 )
 
@@ -131,9 +132,9 @@ func TestItoa(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
-			got := itoa(tt.n)
+			got := strconv.Itoa(tt.n)
 			if got != tt.want {
-				t.Errorf("itoa(%d) = %q, want %q", tt.n, got, tt.want)
+				t.Errorf("strconv.Itoa(%d) = %q, want %q", tt.n, got, tt.want)
 			}
 		})
 	}

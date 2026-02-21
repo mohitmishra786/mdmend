@@ -92,9 +92,62 @@ function getDownloadUrl(version) {
   return `https://github.com/${GITHUB_REPO}/releases/${versionTag}/download/mdmend_${version}_${platform}_${arch}.${ext}`;
 }
 
+async function getLatestTag() {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'api.github.com',
+      path: `/repos/${GITHUB_REPO}/releases/latest`,
+      headers: { 'User-Agent': 'nodejs' }
+    };
+    https.get(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        if (res.statusCode !== 200) {
+          reject(new Error(`Failed to fetch latest release: ${res.statusCode}`));
+          return;
+        }
+        const release = JSON.parse(data);
+        resolve(release.tag_name.replace(/^v/, ''));
+      });
+    }).on('error', reject);
+  });
+}
+
 async function install() {
-  // Download and extract binary
-  // ... implementation
+  const binDir = path.join(__dirname, 'bin');
+  const binaryName = getBinaryName();
+  const binaryPath = path.join(binDir, binaryName);
+  
+  if (fs.existsSync(binaryPath)) {
+    console.log('mdmend binary already exists, skipping download');
+    return;
+  }
+  
+  fs.mkdirSync(binDir, { recursive: true });
+  
+  let version = VERSION;
+  if (version === 'latest') {
+    try {
+      version = await getLatestTag();
+    } catch (err) {
+      console.error('Warning: Failed to fetch latest version tag, falling back to literal "latest"');
+    }
+  }
+
+  const downloadUrl = getDownloadUrl(version);
+  console.log(`Downloading mdmend v${version} from ${downloadUrl}`);
+  
+  const tmpFile = path.join(os.tmpdir(), `mdmend-${Date.now()}.tar.gz`);
+  
+  try {
+    await downloadFile(downloadUrl, tmpFile);
+    // ... rest of implementation
+  } finally {
+    if (fs.existsSync(tmpFile)) {
+      fs.unlinkSync(tmpFile);
+    }
+  }
 }
 
 install();

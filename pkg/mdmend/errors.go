@@ -24,7 +24,10 @@ type PathError struct {
 }
 
 func (e *PathError) Error() string {
-	return e.Op + " " + e.Path + ": " + e.Err.Error()
+	if e.Path != "" {
+		return e.Op + " " + e.Path + ": " + e.Err.Error()
+	}
+	return e.Op + ": " + e.Err.Error()
 }
 
 func (e *PathError) Unwrap() error {

@@ -309,13 +309,26 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$Repo = "mohitmishra786/mdmend"
-$Arch = if ([Environment]::Is64BitOperatingSystem) { "amd64" } else { "arm64" }
+# Map processor architecture to canonical names
+$RawArch = $env:PROCESSOR_ARCHITECTURE
+$Arch = switch ($RawArch) {
+    "AMD64" { "amd64" }
+    "ARM64" { "arm64" }
+    default {
+        Write-Warning "Unknown architecture: $RawArch. Falling back to amd64."
+        "amd64"
+    }
+}
 
 # Get version
 if ($Version -eq "latest") {
-    $Release = Invoke-RestMethod "https://api.github.com/repos/$Repo/releases/latest"
-    $Version = $Release.tag_name.TrimStart('v')
+    try {
+        $Release = Invoke-RestMethod "https://api.github.com/repos/$Repo/releases/latest"
+        $Version = $Release.tag_name.TrimStart('v')
+    } catch {
+        Write-Error "Failed to fetch latest version from GitHub API: $_"
+        exit 1
+    }
 }
 
 # Download

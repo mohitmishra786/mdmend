@@ -1,6 +1,7 @@
 package mdmend
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -25,7 +26,7 @@ func TestDefaultConfig(t *testing.T) {
 
 func TestConfigIsDisabled(t *testing.T) {
 	cfg := &Config{
-		disable: []string{"MD013", "MD033", "MD024"},
+		Disable: []string{"MD013", "MD033", "MD024"},
 	}
 
 	tests := []struct {
@@ -52,7 +53,7 @@ func TestConfigIsDisabled(t *testing.T) {
 
 func TestConfigGetRuleConfig(t *testing.T) {
 	cfg := &Config{
-		rules: map[string]RuleConfig{
+		Rules: map[string]RuleConfig{
 			"MD003": {Style: "atx"},
 			"MD007": {Indent: 4},
 		},
@@ -87,7 +88,7 @@ func TestConfigGetTabSize(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg := &Config{tabSize: tt.tabSize}
+			cfg := &Config{TabSize: tt.tabSize}
 			got := cfg.GetTabSize()
 			if got != tt.want {
 				t.Errorf("GetTabSize() = %d, want %d", got, tt.want)
@@ -98,8 +99,8 @@ func TestConfigGetTabSize(t *testing.T) {
 
 func TestWithConfig(t *testing.T) {
 	customCfg := &Config{
-		tabSize: 2,
-		disable: []string{"MD040"},
+		TabSize: 2,
+		Disable: []string{"MD040"},
 	}
 
 	client := NewClient(WithConfig(customCfg))
@@ -131,7 +132,7 @@ func TestWithIgnorePatterns(t *testing.T) {
 
 	for _, pattern := range []string{"node_modules/", "vendor/", "*.generated.md"} {
 		found := false
-		for _, p := range cfg.ignore {
+		for _, p := range cfg.Ignore {
 			if p == pattern {
 				found = true
 				break
@@ -151,10 +152,12 @@ func TestWithTabSize(t *testing.T) {
 		{2, 2},
 		{4, 4},
 		{8, 8},
+		{0, 4},
+		{-1, 4},
 	}
 
 	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
+		t.Run(fmt.Sprintf("tabSize=%d", tt.tabSize), func(t *testing.T) {
 			client := NewClient(WithTabSize(tt.tabSize))
 			cfg := client.Config()
 			if cfg.GetTabSize() != tt.want {
@@ -168,7 +171,7 @@ func TestWithAggressiveMode(t *testing.T) {
 	client := NewClient(WithAggressiveMode(true))
 	cfg := client.Config()
 
-	if !cfg.aggressive {
+	if !cfg.Aggressive {
 		t.Error("expected aggressive mode to be enabled")
 	}
 }
@@ -286,7 +289,7 @@ func TestCombinedOptions(t *testing.T) {
 	if !cfg.IsDisabled("MD033") {
 		t.Error("MD033 should be disabled")
 	}
-	if !cfg.aggressive {
+	if !cfg.Aggressive {
 		t.Error("aggressive mode should be enabled")
 	}
 	if !client.dryRun {

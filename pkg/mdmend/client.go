@@ -3,7 +3,8 @@ package mdmend
 import (
 	"io"
 	"os"
-	"strings"
+
+	"github.com/pmezard/go-difflib/difflib"
 
 	"github.com/mohitmishra786/mdmend/internal/config"
 	"github.com/mohitmishra786/mdmend/internal/fixer"
@@ -13,8 +14,9 @@ import (
 )
 
 type Client struct {
-	cfg    *config.Config
-	dryRun bool
+	cfg             *config.Config
+	dryRun          bool
+	ConfigLoadError error
 }
 
 func NewClient(opts ...Option) *Client {
@@ -23,11 +25,11 @@ func NewClient(opts ...Option) *Client {
 		opt(options)
 	}
 
+	var loadErr error
 	cfg := options.cfg
 	if cfg == nil {
-		var err error
-		cfg, err = config.Load(options.configPath)
-		if err != nil {
+		cfg, loadErr = config.Load(options.configPath)
+		if loadErr != nil {
 			cfg = config.Default()
 		}
 	}
@@ -46,8 +48,9 @@ func NewClient(opts ...Option) *Client {
 	}
 
 	return &Client{
-		cfg:    cfg,
-		dryRun: options.dryRun,
+		cfg:             cfg,
+		dryRun:          options.dryRun,
+		ConfigLoadError: loadErr,
 	}
 }
 
@@ -60,8 +63,6 @@ func (c *Client) LintString(content, path string) LintResult {
 	result := l.Lint(content, path)
 	return LintResult{
 		Violations: convertViolations(result.Violations),
-		Fixable:    result.Fixable,
-		Unfixable:  result.Unfixable,
 	}
 }
 
@@ -172,8 +173,10 @@ func (c *Client) FixFiles(paths []string) ([]FileResult, error) {
 		if fixResult.Changed && !c.dryRun {
 			if err := fixer.AtomicWrite(path, []byte(fixResult.Content)); err != nil {
 				results = append(results, FileResult{
-					Path:  path,
-					Error: WrapWriteError(path, err),
+					Path:       path,
+					Violations: convertViolations(fixResult.Violations),
+					Changed:    fixResult.Changed,
+					Error:      WrapWriteError(path, err),
 				})
 				continue
 			}
@@ -237,38 +240,15 @@ func convertViolations(violations []rules.Violation) []Violation {
 }
 
 func formatUnifiedDiff(path, original, modified string) string {
-	var sb strings.Builder
-	sb.WriteString("--- ")
-	sb.WriteString(path)
-	sb.WriteString("\n+++ ")
-	sb.WriteString(path)
-	sb.WriteString("\n")
-
-	origLines := strings.Split(original, "\n")
-	modLines := strings.Split(modified, "\n")
-
-	i, j := 0, 0
-	for i < len(origLines) || j < len(modLines) {
-		if i < len(origLines) && j < len(modLines) && origLines[i] == modLines[j] {
-			sb.WriteString(" ")
-			sb.WriteString(origLines[i])
-			sb.WriteString("\n")
-			i++
-			j++
-		} else if i < len(origLines) && (j >= len(modLines) || origLines[i] != modLines[j]) {
-			sb.WriteString("-")
-			sb.WriteString(origLines[i])
-			sb.WriteString("\n")
-			i++
-		} else if j < len(modLines) {
-			sb.WriteString("+")
-			sb.WriteString(modLines[j])
-			sb.WriteString("\n")
-			j++
-		}
+	diff := difflib.UnifiedDiff{
+		A:        difflib.SplitLines(original),
+		B:        difflib.SplitLines(modified),
+		FromFile: path,
+		ToFile:   path,
+		Context:  3,
 	}
-
-	return sb.String()
+	text, _ := difflib.GetUnifiedDiffString(diff)
+	return text
 }
 
 func LintString(content, path string, opts ...Option) LintResult {

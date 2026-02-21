@@ -44,6 +44,9 @@ func WithIgnorePatterns(patterns ...string) Option {
 
 func WithTabSize(size int) Option {
 	return func(o *clientOptions) {
+		if size <= 0 {
+			size = 4
+		}
 		o.tabSize = size
 	}
 }

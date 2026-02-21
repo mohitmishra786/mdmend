@@ -1,5 +1,7 @@
 package mdmend
 
+import "strconv"
+
 type Violation struct {
 	Rule      string
 	Line      int
@@ -10,13 +12,31 @@ type Violation struct {
 }
 
 func (v Violation) String() string {
-	return v.Rule + ":" + itoa(v.Line) + ":" + itoa(v.Column) + ": " + v.Message
+	return v.Rule + ":" + strconv.Itoa(v.Line) + ":" + strconv.Itoa(v.Column) + ": " + v.Message
 }
 
 type LintResult struct {
 	Violations []Violation
-	Fixable    int
-	Unfixable  int
+}
+
+func (r LintResult) FixableCount() int {
+	count := 0
+	for _, v := range r.Violations {
+		if v.Fixable {
+			count++
+		}
+	}
+	return count
+}
+
+func (r LintResult) UnfixableCount() int {
+	count := 0
+	for _, v := range r.Violations {
+		if !v.Fixable {
+			count++
+		}
+	}
+	return count
 }
 
 func (r LintResult) HasViolations() bool {
@@ -39,14 +59,4 @@ type FileResult struct {
 
 func (r FileResult) HasViolations() bool {
 	return len(r.Violations) > 0
-}
-
-func itoa(n int) string {
-	if n < 0 {
-		return "-" + itoa(-n)
-	}
-	if n < 10 {
-		return string(rune('0' + n))
-	}
-	return itoa(n/10) + string(rune('0'+n%10))
 }

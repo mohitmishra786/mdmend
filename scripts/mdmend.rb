@@ -40,8 +40,8 @@ class Mdmend < Formula
   end
 
   test do
-    # Test version flag
-    assert_match "mdmend version", shell_output("#{bin}/mdmend --version")
+    # Test version flag - match actual output format
+    assert_match(/mdmend\s+/, shell_output("#{bin}/mdmend --version"))
 
     # Test lint command
     test_file = testpath/"test.md"
@@ -55,3 +55,5 @@ class Mdmend < Formula
     assert_match "MD010", output
   end
 end
+# NOTE: The sha256 values above are placeholders and must be updated 
+# with actual checksums for each release.

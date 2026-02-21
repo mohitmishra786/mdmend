@@ -5,11 +5,12 @@ import (
 )
 
 type Config struct {
-	disable    []string
-	rules      map[string]RuleConfig
-	ignore     []string
-	tabSize    int
-	aggressive bool
+	Disable    []string
+	Rules      map[string]RuleConfig
+	Ignore     []string
+	TabSize    int
+	Aggressive bool
+	disableSet map[string]bool
 }
 
 type RuleConfig struct {
@@ -40,41 +41,50 @@ type RuleConfig struct {
 }
 
 func DefaultConfig() *Config {
-	return fromInternalConfig(config.Default())
+	cfg := fromInternalConfig(config.Default())
+	cfg.initDisableSet()
+	return cfg
+}
+
+func (c *Config) initDisableSet() {
+	c.disableSet = make(map[string]bool)
+	for _, id := range c.Disable {
+		c.disableSet[id] = true
+	}
 }
 
 func (c *Config) IsDisabled(ruleID string) bool {
-	for _, id := range c.disable {
-		if id == ruleID {
-			return true
-		}
+	if c.disableSet == nil {
+		c.initDisableSet()
 	}
-	return false
+	return c.disableSet[ruleID]
 }
 
 func (c *Config) GetRuleConfig(ruleID string) RuleConfig {
-	if rc, ok := c.rules[ruleID]; ok {
+	if rc, ok := c.Rules[ruleID]; ok {
 		return rc
 	}
 	return RuleConfig{}
 }
 
 func (c *Config) GetTabSize() int {
-	if c.tabSize > 0 {
-		return c.tabSize
+	if c.TabSize > 0 {
+		return c.TabSize
 	}
 	return 4
 }
 
 func (c *Config) toInternal() *config.Config {
 	cfg := config.Default()
-	cfg.Disable = c.disable
-	cfg.Ignore = c.ignore
-	cfg.TabSize = c.tabSize
-	cfg.Aggressive = c.aggressive
-	if c.rules != nil {
-		cfg.Rules = make(map[string]config.RuleConfig)
-		for id, rc := range c.rules {
+	cfg.Disable = c.Disable
+	cfg.Ignore = c.Ignore
+	cfg.TabSize = c.TabSize
+	cfg.Aggressive = c.Aggressive
+	if c.Rules != nil {
+		if cfg.Rules == nil {
+			cfg.Rules = make(map[string]config.RuleConfig)
+		}
+		for id, rc := range c.Rules {
 			cfg.Rules[id] = toInternalRuleConfig(rc)
 		}
 	}
@@ -86,13 +96,15 @@ func fromInternalConfig(cfg *config.Config) *Config {
 	for id, rc := range cfg.Rules {
 		rules[id] = fromInternalRuleConfig(rc)
 	}
-	return &Config{
-		disable:    cfg.Disable,
-		rules:      rules,
-		ignore:     cfg.Ignore,
-		tabSize:    cfg.TabSize,
-		aggressive: cfg.Aggressive,
+	c := &Config{
+		Disable:    cfg.Disable,
+		Rules:      rules,
+		Ignore:     cfg.Ignore,
+		TabSize:    cfg.TabSize,
+		Aggressive: cfg.Aggressive,
 	}
+	c.initDisableSet()
+	return c
 }
 
 func fromInternalRuleConfig(rc config.RuleConfig) RuleConfig {

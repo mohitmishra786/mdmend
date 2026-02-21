@@ -103,7 +103,7 @@ func TestGetRuleInfoKnownRules(t *testing.T) {
 
 func TestEnabledRules(t *testing.T) {
 	cfg := &Config{
-		disable: []string{"MD013", "MD033"},
+		Disable: []string{"MD013", "MD033"},
 	}
 
 	rules := EnabledRules(cfg)
@@ -121,7 +121,7 @@ func TestEnabledRules(t *testing.T) {
 func TestEnabledRulesAllDisabled(t *testing.T) {
 	allIDs := RuleIDs()
 	cfg := &Config{
-		disable: allIDs,
+		Disable: allIDs,
 	}
 
 	rules := EnabledRules(cfg)
@@ -144,16 +144,47 @@ func TestFixableRules(t *testing.T) {
 	}
 }
 
-func TestRegisterRuleNil(t *testing.T) {
-	err := RegisterRule(nil)
-	if err == nil {
-		t.Error("expected error for nil rule")
-	}
+func TestRegisterRule(t *testing.T) {
+	t.Run("nil rule", func(t *testing.T) {
+		err := RegisterRule(nil)
+		if err == nil {
+			t.Error("expected error for nil rule")
+		}
+		if !IsRuleError(err) {
+			t.Errorf("expected RuleError, got %T", err)
+		}
+	})
 
-	if !IsRuleError(err) {
-		t.Errorf("expected RuleError, got %T", err)
-	}
+	t.Run("success and duplicate", func(t *testing.T) {
+		rule := &mockRule{id: "CUSTOM001"}
+
+		// First registration
+		err := RegisterRule(rule)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		// Duplicate registration
+		err = RegisterRule(rule)
+		if err == nil {
+			t.Error("expected error for duplicate registration")
+		}
+		if !IsRuleError(err) {
+			t.Errorf("expected RuleError, got %T", err)
+		}
+	})
 }
+
+type mockRule struct {
+	id string
+}
+
+func (m *mockRule) ID() string                      { return m.id }
+func (m *mockRule) Name() string                    { return "mock" }
+func (m *mockRule) Description() string             { return "mock" }
+func (m *mockRule) Fixable() bool                   { return false }
+func (m *mockRule) Lint(string, string) []Violation { return nil }
+func (m *mockRule) Fix(string, string) FixResult    { return FixResult{} }
 
 func TestRuleInfoStruct(t *testing.T) {
 	info := RuleInfo{

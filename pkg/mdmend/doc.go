@@ -10,7 +10,7 @@
 // Basic usage with default configuration:
 //
 //	client := mdmend.NewClient()
-//	result := client.LintString("# Hello World\n")
+//	result := client.LintString("# Hello World\n", "example.md")
 //	for _, v := range result.Violations {
 //	    fmt.Printf("%s:%d:%d: %s\n", v.Rule, v.Line, v.Column, v.Message)
 //	}
@@ -26,7 +26,7 @@
 //
 // Or use a config file:
 //
-//	client, err := mdmend.NewClient(mdmend.WithConfigFile(".mdmend.yml"))
+//	client := mdmend.NewClient(mdmend.WithConfigFile(".mdmend.yml"))
 //
 // # Linting
 //
