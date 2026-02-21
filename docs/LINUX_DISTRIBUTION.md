@@ -225,7 +225,16 @@ Create `scripts/build-appimage.sh`:
 set -e
 
 VERSION=${1:-$(git describe --tags --abbrev=0 | sed 's/v//')}
-ARCH=${2:-$(uname -m)}
+RAW_ARCH=${2:-$(uname -m)}
+
+# Normalize architecture names to match goreleaser artifacts
+ARCH=$(case "$RAW_ARCH" in
+    x86_64) echo "amd64" ;;
+    aarch64|arm64) echo "arm64" ;;
+    i386|i686) echo "386" ;;
+    armv7l) echo "armv7" ;;
+    *) echo "$RAW_ARCH" ;;
+esac)
 
 # Download binary
 curl -sSL "https://github.com/mohitmishra786/mdmend/releases/download/v${VERSION}/mdmend_${VERSION}_linux_${ARCH}.tar.gz" | tar xz
@@ -243,12 +252,12 @@ Type=Application
 Categories=Development;
 EOF
 
-# Download AppImageTool
-wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${ARCH}.AppImage
+# Download AppImageTool (uses normalized arch for download, raw arch for appimagetool naming)
+wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${RAW_ARCH}.AppImage
 chmod +x appimagetool-*.AppImage
 
 # Build AppImage
-./appimagetool-*.AppImage AppDir mdmend-${VERSION}-${ARCH}.AppImage
+./appimagetool-*.AppImage AppDir mdmend-${VERSION}-${RAW_ARCH}.AppImage
 ```
 
 ### Installation Commands

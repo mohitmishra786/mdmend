@@ -1,6 +1,7 @@
 package mdmend
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -156,7 +157,8 @@ func TestRegisterRule(t *testing.T) {
 	})
 
 	t.Run("success and duplicate", func(t *testing.T) {
-		rule := &mockRule{id: "CUSTOM001"}
+		uniqueID := "CUSTOM001_" + strings.ReplaceAll(t.Name(), "/", "_")
+		rule := &mockRule{id: uniqueID}
 
 		// First registration
 		err := RegisterRule(rule)

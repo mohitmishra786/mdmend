@@ -17,10 +17,11 @@ func init() {
 	Register(&MD040{Fallback: "text", Confidence: 0.6, Aggressive: false})
 }
 
-func (r *MD040) ID() string          { return "MD040" }
-func (r *MD040) Name() string        { return "fenced-code-language" }
-func (r *MD040) Description() string { return "Fenced code blocks should have a language specified" }
-func (r *MD040) Fixable() bool       { return true }
+func (r *MD040) ID() string                 { return "MD040" }
+func (r *MD040) Name() string               { return "fenced-code-language" }
+func (r *MD040) Description() string        { return "Fenced code blocks should have a language specified" }
+func (r *MD040) Fixable() bool              { return true }
+func (r *MD040) SetAggressive(enabled bool) { r.Aggressive = enabled }
 
 var codeFenceLangRegex = regexp.MustCompile("^(`{3,}|~{3,})(.*)$")
 

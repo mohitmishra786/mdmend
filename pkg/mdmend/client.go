@@ -247,7 +247,10 @@ func formatUnifiedDiff(path, original, modified string) string {
 		ToFile:   path,
 		Context:  3,
 	}
-	text, _ := difflib.GetUnifiedDiffString(diff)
+	text, err := difflib.GetUnifiedDiffString(diff)
+	if err != nil {
+		return ""
+	}
 	return text
 }
 

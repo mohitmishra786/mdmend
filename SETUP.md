@@ -6,7 +6,7 @@ This guide covers setting up mdmend for local development.
 
 | Requirement | Version | Purpose |
 |-------------|---------|---------|
-| Go | 1.21+ | Build and run |
+| Go | 1.22+ | Build and run |
 | Make | Any | Build automation |
 | golangci-lint | 1.54+ | Linting (optional) |
 
@@ -45,8 +45,8 @@ sudo apt install golang-go
 **Linux (manual)**
 ```bash
 # Download latest from https://go.dev/dl/
-wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz
+wget https://go.dev/dl/go1.22.10.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.22.10.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 ```
 
@@ -109,12 +109,6 @@ make self-lint
 ## Project Structure
 
 ```text
-mdmend/
-├── cmd/
-│   └── mdmend/           # CLI application
-...
-└── go.mod                # Dependencies
-```
 mdmend/
 ├── cmd/
 │   └── mdmend/           # CLI application
@@ -222,7 +216,7 @@ make test-coverage
 
 ### Go Version Issues
 ```bash
-go version  # Ensure 1.21+
+go version  # Ensure 1.22+
 ```
 
 ### Module Issues

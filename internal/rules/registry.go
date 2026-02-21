@@ -18,10 +18,11 @@ func Register(rule Rule) {
 func RegisterSafely(rule Rule) bool {
 	mu.Lock()
 	defer mu.Unlock()
-	if _, exists := registry[rule.ID()]; exists {
+	id := rule.ID()
+	if _, exists := registry[id]; exists {
 		return false
 	}
-	registry[rule.ID()] = rule
+	registry[id] = rule
 	return true
 }
 

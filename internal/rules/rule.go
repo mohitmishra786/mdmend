@@ -33,6 +33,11 @@ type Rule interface {
 	Fix(content string, path string) FixResult
 }
 
+type AggressiveRule interface {
+	Rule
+	SetAggressive(enabled bool)
+}
+
 type Severity string
 
 const (

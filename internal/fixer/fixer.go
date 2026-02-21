@@ -16,6 +16,9 @@ func New(cfg *config.Config) *Fixer {
 	var enabledRules []rules.Rule
 	for _, r := range rules.OrderedForFix() {
 		if !cfg.IsDisabled(r.ID()) {
+			if ar, ok := r.(rules.AggressiveRule); ok && cfg.Aggressive {
+				ar.SetAggressive(true)
+			}
 			enabledRules = append(enabledRules, r)
 		}
 	}

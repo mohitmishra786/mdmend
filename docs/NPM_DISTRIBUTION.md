@@ -72,8 +72,10 @@ function getDownloadUrl(version) {
   const platform = getPlatform();
   const arch = getArch();
   const ext = platform === 'windows' ? 'zip' : 'tar.gz';
-  const versionTag = version === 'latest' ? 'latest' : `v${version}`;
-  return `https://github.com/${GITHUB_REPO}/releases/${versionTag}/download/mdmend_${version}_${platform}_${arch}.${ext}`;
+  const basePath = version === 'latest' 
+    ? 'releases/latest/download' 
+    : `releases/download/v${version}`;
+  return `https://github.com/${GITHUB_REPO}/${basePath}/mdmend_${version}_${platform}_${arch}.${ext}`;
 }
 
 async function getLatestTag() {
@@ -115,14 +117,18 @@ async function install() {
     try {
       version = await getLatestTag();
     } catch (err) {
-      console.error('Warning: Failed to fetch latest version tag, falling back to literal "latest"');
+      console.error('Error: Failed to fetch latest version tag from GitHub');
+      console.error(`Details: ${err.message}`);
+      process.exit(1);
     }
   }
 
+  const platform = getPlatform();
+  const ext = platform === 'windows' ? 'zip' : 'tar.gz';
   const downloadUrl = getDownloadUrl(version);
   console.log(`Downloading mdmend v${version} from ${downloadUrl}`);
   
-  const tmpFile = path.join(os.tmpdir(), `mdmend-${Date.now()}.tar.gz`);
+  const tmpFile = path.join(os.tmpdir(), `mdmend-${Date.now()}.${ext}`);
   
   try {
     await downloadFile(downloadUrl, tmpFile);

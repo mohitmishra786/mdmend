@@ -6,7 +6,11 @@ BINARY_NAME="mdmend"
 
 get_latest_version() {
     local version
-    version=$(curl -s "https://api.github.com/repos/${REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+    version=$(curl -sSf "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+    if [ -z "$version" ]; then
+        echo "Error: Failed to fetch latest version from ${REPO}" >&2
+        return 1
+    fi
     echo "$version"
 }
 
@@ -41,13 +45,10 @@ install_macos() {
 
 install_linux() {
     if command -v apt-get &> /dev/null; then
-        echo "Installing via apt-get..."
-        sudo apt-get update
-        sudo apt-get install -y curl
-        # Fallback to binary install if no repo script, but try to be safe
+        echo "apt-get detected. Consider installing via repository or use binary fallback."
         return 1
     elif command -v yum &> /dev/null; then
-        echo "Installing via yum..."
+        echo "yum detected. Consider installing via repository or use binary fallback."
         return 1
     fi
     return 1
@@ -60,14 +61,19 @@ verify_checksum() {
     
     echo "Verifying checksum..."
     local checksum_file="${tmp_dir}/checksums.txt"
-    curl -sSL "$checksum_url" -o "$checksum_file"
+    
+    if ! curl -sSLf "$checksum_url" -o "$checksum_file" 2>/dev/null; then
+        echo "Warning: Failed to download checksums from $checksum_url"
+        echo "Continuing without verification..."
+        return 0
+    fi
     
     local expected_checksum
     expected_checksum=$(grep "$(basename "$file")" "$checksum_file" | cut -d ' ' -f 1)
     
     if [ -z "$expected_checksum" ]; then
-        echo "Error: Checksum not found for $(basename "$file")"
-        return 1
+        echo "Warning: Checksum not found for $(basename "$file")"
+        return 0
     fi
     
     local actual_checksum

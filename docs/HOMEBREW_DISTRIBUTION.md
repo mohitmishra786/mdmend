@@ -246,7 +246,7 @@ jobs:
       - name: Update Homebrew tap
         uses: goreleaser/goreleaser-action@v5
         with:
-          args: release --skip-validate
+          args: release
         env:
           GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
 ```
@@ -361,7 +361,11 @@ brew install mdmend
 
 **Permission denied**
 ```bash
-sudo chown -R $(whoami) $(brew --prefix)/*
+# Run brew doctor to diagnose issues
+brew doctor
+
+# If issues persist, consider reinstalling Homebrew
+# See: https://docs.brew.sh/Installation
 ```
 
 ### Debug Mode

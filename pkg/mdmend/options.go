@@ -63,6 +63,9 @@ func WithDryRun(enabled bool) Option {
 	}
 }
 
+// WithRuleConfig sets a specific rule's configuration.
+// Note: Calling WithConfig after this will overwrite these settings,
+// as WithConfig replaces the entire configuration object.
 func WithRuleConfig(ruleID string, rc RuleConfig) Option {
 	return func(o *clientOptions) {
 		if o.cfg == nil {

@@ -1,11 +1,10 @@
 param(
     [string]$Version = "latest",
-    [string]$InstallDir = "$env:USERPROFILE\.mdmend"
+    [string]$InstallDir = "$env:USERPROFILE\.mdmend",
+    [string]$Repo = "mohitmishra786/mdmend"
 )
 
 $ErrorActionPreference = "Stop"
-
-$Repo = "mohitmishra786/mdmend"
 
 # Map processor architecture to canonical names
 $RawArch = $env:PROCESSOR_ARCHITECTURE
@@ -31,9 +30,10 @@ if ($Version -eq "latest") {
 
 # Download
 $Url = "https://github.com/$Repo/releases/download/v$Version/mdmend_${Version}_windows_${Arch}.zip"
+$ChecksumUrl = "https://github.com/$Repo/releases/download/v$Version/checksums.txt"
 $ZipPath = "$env:TEMP\mdmend.zip"
 
-Write-Host "Downloading mdmend v$Version for $Arch..."
+Write-Output "Downloading mdmend v$Version for $Arch..."
 try {
     Invoke-WebRequest -Uri $Url -OutFile $ZipPath
 } catch {
@@ -41,20 +41,49 @@ try {
     exit 1
 }
 
-# Extract
-Write-Host "Installing to $InstallDir..."
-if (!(Test-Path $InstallDir)) {
-    New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
+# Verify checksum
+Write-Output "Verifying checksum..."
+try {
+    $ChecksumFile = "$env:TEMP\checksums.txt"
+    Invoke-WebRequest -Uri $ChecksumUrl -OutFile $ChecksumFile
+    $ExpectedChecksum = (Select-String -Path $ChecksumFile -Pattern "mdmend_${Version}_windows_${Arch}.zip" | ForEach-Object { $_.Line.Split()[0] })
+    
+    if ($ExpectedChecksum) {
+        $ActualChecksum = (Get-FileHash -Path $ZipPath -Algorithm SHA256).Hash.ToLower()
+        if ($ActualChecksum -ne $ExpectedChecksum.ToLower()) {
+            Write-Error "Checksum verification failed! Expected: $ExpectedChecksum, Got: $ActualChecksum"
+            Remove-Item $ZipPath -Force -ErrorAction SilentlyContinue
+            Remove-Item $ChecksumFile -Force -ErrorAction SilentlyContinue
+            exit 1
+        }
+        Write-Output "Checksum verified successfully."
+    } else {
+        Write-Warning "Could not find checksum for this artifact, skipping verification."
+    }
+    Remove-Item $ChecksumFile -Force -ErrorAction SilentlyContinue
+} catch {
+    Write-Warning "Checksum verification failed: $_. Continuing without verification."
 }
-Expand-Archive -Path $ZipPath -DestinationPath $InstallDir -Force
-Remove-Item $ZipPath
+
+# Extract
+Write-Output "Installing to $InstallDir..."
+try {
+    if (!(Test-Path $InstallDir)) {
+        New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
+    }
+    Expand-Archive -Path $ZipPath -DestinationPath $InstallDir -Force
+} finally {
+    if (Test-Path $ZipPath) {
+        Remove-Item $ZipPath -Force
+    }
+}
 
 # Add to PATH
 $Path = [Environment]::GetEnvironmentVariable("PATH", "User")
 if ($Path -notlike "*$InstallDir*") {
     [Environment]::SetEnvironmentVariable("PATH", "$Path;$InstallDir", "User")
-    Write-Host "Added $InstallDir to PATH"
+    Write-Output "Added $InstallDir to PATH"
 }
 
-Write-Host "mdmend v$Version installed successfully!"
-Write-Host "Run 'mdmend --help' to get started."
+Write-Output "mdmend v$Version installed successfully!"
+Write-Output "Run 'mdmend --help' to get started."
