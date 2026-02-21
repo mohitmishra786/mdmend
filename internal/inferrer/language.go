@@ -25,7 +25,8 @@ var patterns = []patternMatcher{
 	{"toml", regexp.MustCompile(`(?m)^\[[\w.]+\]`)},
 	{"xml", regexp.MustCompile(`(?m)^<\?xml|^<[\w:]+[\s>]`)},
 	{"html", regexp.MustCompile(`(?mi)^<!DOCTYPE|^<html`)},
-	{"go", regexp.MustCompile(`(?m)^package\s\w+|^func\s|^import\s`)},
+	{"java", regexp.MustCompile(`(?m)^package\s+[\w.]+;|^(import java\.|import javax\.|public class|private class|public interface)`)},
+	{"go", regexp.MustCompile(`(?m)^package\s+\w+\s*$|^func\s|^import\s`)},
 	{"python", regexp.MustCompile(`(?m)^(import |from \w+ import|def |class |if __name__)`)},
 	{"javascript", regexp.MustCompile(`(?m)^(const |let |var |function |import |export |module\.exports)`)},
 	{"typescript", regexp.MustCompile(`(?m)^(interface |type |enum |const .+:\s*\w+)`)},
@@ -36,7 +37,6 @@ var patterns = []patternMatcher{
 	{"makefile", regexp.MustCompile(`(?m)^[a-zA-Z_-]+:|^\.PHONY`)},
 	{"sh", regexp.MustCompile(`(?m)^#!/.*/(bash|sh|zsh)`)},
 	{"ruby", regexp.MustCompile(`(?m)^(require|class|def |module |end$)`)},
-	{"java", regexp.MustCompile(`(?m)^(import java\.|import javax\.|public class|private class|public interface)`)},
 	{"c", regexp.MustCompile(`(?m)^(#include|#define|int |void |char )`)},
 	{"cpp", regexp.MustCompile(`(?m)^(#include|#include <iostream>|using namespace|std::)`)},
 }
