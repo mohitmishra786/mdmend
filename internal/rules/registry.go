@@ -15,6 +15,17 @@ func Register(rule Rule) {
 	registry[rule.ID()] = rule
 }
 
+func RegisterSafely(rule Rule) bool {
+	mu.Lock()
+	defer mu.Unlock()
+	id := rule.ID()
+	if _, exists := registry[id]; exists {
+		return false
+	}
+	registry[id] = rule
+	return true
+}
+
 func Get(id string) Rule {
 	mu.RLock()
 	defer mu.RUnlock()

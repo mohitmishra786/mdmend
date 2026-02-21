@@ -1,5 +1,5 @@
 # Binaries
-mdmend
+/mdmend
 *.exe
 *.exe~
 *.dll

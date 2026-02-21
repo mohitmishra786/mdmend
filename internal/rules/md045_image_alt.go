@@ -69,10 +69,11 @@ func init() {
 	Register(&MD051{SuggestClosest: true, Aggressive: false})
 }
 
-func (r *MD051) ID() string          { return "MD051" }
-func (r *MD051) Name() string        { return "link-fragments" }
-func (r *MD051) Description() string { return "Link fragments should be valid" }
-func (r *MD051) Fixable() bool       { return true }
+func (r *MD051) ID() string                 { return "MD051" }
+func (r *MD051) Name() string               { return "link-fragments" }
+func (r *MD051) Description() string        { return "Link fragments should be valid" }
+func (r *MD051) Fixable() bool              { return true }
+func (r *MD051) SetAggressive(enabled bool) { r.Aggressive = enabled }
 
 var fragmentLinkRegex = regexp.MustCompile(`\[([^\]]*)\]\(#([^)]+)\)`)
 
