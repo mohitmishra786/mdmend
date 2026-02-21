@@ -36,7 +36,7 @@ var patterns = []patternMatcher{
 	{"makefile", regexp.MustCompile(`(?m)^[a-zA-Z_-]+:|^\.PHONY`)},
 	{"sh", regexp.MustCompile(`(?m)^#!/.*/(bash|sh|zsh)`)},
 	{"ruby", regexp.MustCompile(`(?m)^(require|class|def |module |end$)`)},
-	{"java", regexp.MustCompile(`(?m)^(package |import |public class|private class)`)},
+	{"java", regexp.MustCompile(`(?m)^(import java\.|import javax\.|public class|private class|public interface)`)},
 	{"c", regexp.MustCompile(`(?m)^(#include|#define|int |void |char )`)},
 	{"cpp", regexp.MustCompile(`(?m)^(#include|#include <iostream>|using namespace|std::)`)},
 }
