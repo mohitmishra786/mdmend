@@ -1,24 +1,34 @@
 # mdmend
 
-> **Mend your Markdown. Instantly.**
+> Mend your Markdown. Instantly.
 
-`mdmend` is a fast, zero-dependency Markdown linter and fixer written in Go. It automatically fixes common Markdown linting issues and provides intelligent suggestions for code fence language detection (MD040) and bare URL wrapping (MD034).
-
-## Features
-
-- **Single binary** - No runtime dependencies, installs in seconds
-- **Fast** - Parallel file processing with goroutines
-- **Smart fixes** - Intelligent code fence language inference for MD040
-- **Safe** - Dry-run mode, unified diffs, atomic writes
-- **Configurable** - YAML config file compatible with `.markdownlint.json`
-- **Zero-runtime deps** - Unlike `markdownlint-cli2`, no Node.js required
+`mdmend` is a fast, zero-dependency Markdown linter and fixer written in Go.
 
 ## Installation
 
-### Homebrew (macOS/Linux)
+### macOS (Homebrew)
 
 ```bash
 brew install mohitmishra786/tap/mdmend
+```
+
+### Linux
+
+```bash
+curl -sS https://raw.githubusercontent.com/mohitmishra786/mdmend/main/scripts/install.sh | bash
+```
+
+### Windows (Scoop)
+
+```powershell
+scoop bucket add mohitmishra786 https://github.com/mohitmishra786/scoop-bucket
+scoop install mdmend
+```
+
+### npm
+
+```bash
+npm install -g @mdmend/cli
 ```
 
 ### Go
@@ -27,17 +37,9 @@ brew install mohitmishra786/tap/mdmend
 go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest
 ```
 
-### Direct Download
+### Download Binary
 
-Download the latest release from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases).
-
-### From Source
-
-```bash
-git clone https://github.com/mohitmishra786/mdmend.git
-cd mdmend
-make install
-```
+Download from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases).
 
 ## Quick Start
 
@@ -52,252 +54,145 @@ mdmend fix . --dry-run
 mdmend fix . --diff
 
 # Lint only (exit 1 if violations found)
-mdmend lint "**/*.md"
+mdmend lint .
 
-# Get suggestions for heuristic fixes (MD040, MD034)
+# Get suggestions for heuristic fixes
 mdmend suggest docs/
 ```
 
 ## Commands
 
-### `mdmend fix [paths...]`
+| Command | Description |
+|---------|-------------|
+| `mdmend fix [paths...]` | Auto-fix all fixable violations |
+| `mdmend lint [paths...]` | Report violations without fixing |
+| `mdmend suggest [paths...]` | Show suggested fixes for heuristic rules |
+| `mdmend version` | Print version information |
 
-Auto-fix all fixable Markdown lint violations.
+### Fix Command Flags
 
-```bash
-mdmend fix .                          # Fix all .md files recursively
-mdmend fix docs/ --dry-run            # Preview changes in docs/
-mdmend fix README.md --diff           # Show diff for single file
-mdmend fix . --aggressive             # Apply all fixes including heuristics
-```
-
-**Flags:**
-
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--dry-run` | `-n` | Show what would change, don't write files |
-| `--diff` | `-d` | Output unified diffs instead of writing |
-| `--aggressive` | | Apply heuristic fixes (MD040/MD034) without prompting |
-| `--config` | `-c` | Path to config file (default: `.mdmend.yml`) |
-| `--output` | `-o` | Output format: console\|json (default: console) |
-| `--workers` | | Number of parallel workers (default: CPU count) |
-
-### `mdmend lint [paths...]`
-
-Report violations without fixing. Exit code is 1 if any violations are found.
-
-```bash
-mdmend lint .                         # Lint all files
-mdmend lint "**/*.md" --output json   # JSON output for CI
-```
-
-### `mdmend suggest [paths...]`
-
-Show suggested fixes for heuristic rules like MD040 (code fence language).
-
-```bash
-mdmend suggest docs/ --rules MD040
-```
-
-### `mdmend version`
-
-Print version information.
+| Flag | Description |
+|------|-------------|
+| `--dry-run` | Preview changes without writing |
+| `--diff` | Output unified diffs |
+| `--aggressive` | Apply heuristic fixes (MD040/MD034) |
+| `--config` | Path to config file |
+| `--output json` | JSON output format |
 
 ## Supported Rules
 
-### Auto-Fixable (Mechanical)
+### Auto-Fixable
 
 | Rule | Description |
 |------|-------------|
 | MD009 | Trailing spaces |
 | MD010 | Hard tabs |
 | MD011 | Reversed link syntax |
-| MD012 | Multiple consecutive blank lines |
-| MD018 | No space after `#` in ATX heading |
-| MD019 | Multiple spaces after `#` in ATX |
-| MD020 | No space inside hashes (closed ATX) |
-| MD021 | Multiple spaces inside hashes (closed ATX) |
-| MD022 | Headings not surrounded by blank lines |
-| MD023 | Headings not at start of line |
+| MD012 | Multiple blank lines |
+| MD018-MD023 | Heading formatting |
 | MD026 | Trailing punctuation in heading |
-| MD027 | Multiple spaces after blockquote `>` |
+| MD027 | Multiple spaces after blockquote |
 | MD030 | Spaces after list markers |
-| MD031 | Fenced code blocks not surrounded by blank lines |
-| MD032 | Lists not surrounded by blank lines |
-| MD035 | Horizontal rule style inconsistency |
-| MD037 | Spaces inside emphasis markers |
-| MD038 | Spaces inside code span |
-| MD039 | Spaces inside link text |
+| MD031 | Fenced code blank lines |
+| MD032 | List blank lines |
+| MD035 | Horizontal rule style |
+| MD037-MD039 | Spaces in emphasis/links |
 | MD044 | Proper names capitalization |
-| MD047 | File does not end with single newline |
-| MD048 | Code fence style inconsistency |
-| MD049 | Emphasis style inconsistency |
-| MD050 | Strong style inconsistency |
-| MD053 | Unused link/image reference definitions |
+| MD047 | Final newline |
+| MD048 | Code fence style |
+| MD049-MD050 | Emphasis/strong style |
+| MD053 | Unused link references |
 | MD055 | Table pipe style |
-| MD058 | Tables not surrounded by blank lines |
+| MD058 | Table blank lines |
 
 ### Heuristic (Smart Inference)
 
 | Rule | Description |
 |------|-------------|
-| MD034 | Bare URL auto-wrapping (skips code spans/blocks) |
-| MD040 | Code fence language inference from content/hebang/context |
+| MD034 | Bare URL wrapping |
+| MD040 | Code fence language inference |
+
+See [RULES.md](RULES.md) for complete documentation.
 
 ## Configuration
 
 Create `.mdmend.yml` in your project root:
 
 ```yaml
-# Rules to disable entirely
 disable:
-  - MD013   # line length — let Prettier handle it
-  - MD033   # inline HTML — we use it intentionally
+  - MD013
+  - MD033
 
-# Rule-specific config
 rules:
   MD010:
-    tab_size: 2          # spaces to replace tabs with
-  MD026:
-    punctuation: ".,;:!" # which chars to strip from headings
-  MD034:
-    style: angle         # angle | link
+    tab_size: 2
   MD040:
-    fallback: text       # language when inference fails
-    confidence: 0.6      # minimum confidence threshold
-  MD044:
-    names:               # proper names to enforce
-      - JavaScript
-      - TypeScript
-      - GitHub
-      - macOS
-  MD048:
-    style: backtick      # backtick | tilde
+    fallback: text
+    confidence: 0.6
 
-# Files/dirs to ignore (gitignore syntax)
 ignore:
   - node_modules/
-  - vendor/
   - "*.generated.md"
-  - CHANGELOG.md
-
-# Global settings
-tab_size: 4
-aggressive: false
 ```
 
-## MD040 Language Inference
+## Library Usage
 
-`mdmend` intelligently infers code fence languages from:
+Use mdmend as a Go library:
 
-1. **Shebang lines**: `#!/bin/bash` → `bash`, `#!/usr/bin/env python3` → `python`
-2. **Content patterns**: JSON, YAML, SQL, Dockerfile, Go, Rust, etc.
-3. **Heading context**: "## Docker Setup" above a bare fence → `dockerfile`
-4. **File mentions**: "Save this as config.yml" → `yaml`
-5. **Fallback**: Configurable (default: `text`)
+```go
+package main
 
-## Output Formats
+import (
+    "fmt"
+    "github.com/mohitmishra786/mdmend/pkg/mdmend"
+)
 
-### Console (default)
-
-```
-mdmend v1.0.0 — scanning 47 files with 8 workers
-
-docs/api/authentication.md
-  ✗ MD010:12   hard tab → replaced with 4 spaces
-  ✗ MD031:34   missing blank line before fenced block → inserted
-  ✗ MD040:34   no language on code block → inferred: bash (confidence: 0.91)
-
-─────────────────────────────────────────────
-47 files scanned · 3 files would change · 5 violations fixed
-```
-
-### JSON
-
-```json
-{
-  "timestamp": "2024-01-15T10:30:00Z",
-  "files": [
-    {
-      "path": "docs/api.md",
-      "violations": [
-        {"rule": "MD010", "line": 12, "column": 1, "message": "Hard tab", "fixable": true}
-      ],
-      "fixed": 1
-    }
-  ],
-  "summary": {
-    "total_files": 47,
-    "files_with_issues": 3,
-    "total_violations": 5
-  }
+func main() {
+    client := mdmend.NewClient()
+    
+    // Lint markdown string
+    result := client.LintString("# Hello\n", "test.md")
+    fmt.Printf("Violations: %d\n", len(result.Violations))
+    
+    // Fix markdown string
+    fixResult := client.FixString("# Hello\tWorld\n", "test.md")
+    fmt.Printf("Fixed: %s\n", fixResult.Content)
 }
 ```
+
+See [pkg/mdmend](pkg/mdmend) for full API documentation.
 
 ## CI/CD Integration
 
 ### GitHub Actions
 
 ```yaml
-name: Markdown
-on: [push, pull_request]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: mohitmishra786/mdmend-action@v1
-        with:
-          args: lint "**/*.md"
+- uses: mohitmishra786/mdmend-action@v1
+  with:
+    args: lint "**/*.md"
 ```
 
 ### Pre-commit Hook
 
 ```bash
 #!/bin/bash
-mdmend lint . --rules ~MD013,~MD033 || exit 1
+mdmend lint . || exit 1
 ```
 
-## Comparison
+## Documentation
 
-| Feature | mdmend | markdownlint-cli2 | remark-lint |
-|---------|--------|-------------------|-------------|
-| Single binary | ✅ | ❌ (Node.js) | ❌ (Node.js) |
-| Cold start | ~5ms | ~200ms | ~300ms |
-| MD040 inference | ✅ Smart | ❌ | ❌ |
-| Parallel processing | ✅ | ✅ | ❌ |
-| Cross-platform builds | ✅ Easy | ❌ Complex | ❌ Complex |
+- [SETUP.md](SETUP.md) - Development environment setup
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [SECURITY.md](SECURITY.md) - Security policy
+- [RULES.md](RULES.md) - Complete rules documentation
 
-## Development
+## Distribution Plans
 
-```bash
-# Clone and build
-git clone https://github.com/mohitmishra786/mdmend.git
-cd mdmend
-make build
-
-# Run tests
-make test
-
-# Run on itself
-make self-lint
-
-# Release
-make release
-```
+- [npm Distribution](docs/NPM_DISTRIBUTION.md)
+- [Linux Distribution](docs/LINUX_DISTRIBUTION.md)
+- [Homebrew Distribution](docs/HOMEBREW_DISTRIBUTION.md)
+- [Windows Distribution](docs/WINDOWS_DISTRIBUTION.md)
 
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
-
-## Contributing
-
-Contributions are welcome! Please read our contributing guidelines and submit pull requests to the main repository.
-
-## Acknowledgments
-
-Inspired by [`markdownlint`](https://github.com/DavidAnson/markdownlint) and built with:
-- [goldmark](https://github.com/yuin/goldmark) - Markdown parser
-- [cobra](https://github.com/spf13/cobra) - CLI framework
-- [doublestar](https://github.com/bmatcuk/doublestar) - Glob matching
