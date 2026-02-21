@@ -29,6 +29,7 @@ Fast, zero-dependency Markdown linter and fixer. 48 rules. 38 auto-fixable.
 | **AUR** | ![aur](https://img.shields.io/badge/aur-mdmend--bin-blue) | Arch Linux | `yay -S mdmend-bin` |
 | **Snap** | ![snap](https://img.shields.io/badge/snap-mdmend-blue) | Universal Linux | `sudo snap install mdmend` |
 | **Alpine** | ![alpine](https://img.shields.io/badge/alpine-mdmend-blue) | Alpine Linux | See [docs](docs/LINUX_DISTRIBUTION.md) |
+| **Flatpak** | ![flatpak](https://img.shields.io/badge/flatpak-mdmend-blue) | Universal Linux | `flatpak install io.github.mohitmishra786.mdmend` |
 | **Binary** | [![release](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://github.com/mohitmishra786/mdmend/releases) | Direct download | [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases) |
 
 ---
@@ -101,6 +102,12 @@ cd mdmend-bin && makepkg -si
 
 ```bash
 sudo snap install mdmend
+```
+
+### Flatpak
+
+```bash
+flatpak install io.github.mohitmishra786.mdmend
 ```
 
 ### Alpine Linux (apk)
