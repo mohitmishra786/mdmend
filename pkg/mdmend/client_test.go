@@ -485,8 +485,8 @@ func TestClientAggressiveMode(t *testing.T) {
 	aggressiveClient := NewClient(WithAggressiveMode(true))
 	aggressiveResult := aggressiveClient.FixString(content, "test.md")
 
-	if aggressiveResult.Changed && !normalResult.Changed {
-	}
+	_ = normalResult
+	_ = aggressiveResult
 }
 
 func TestClientIgnorePatterns(t *testing.T) {
