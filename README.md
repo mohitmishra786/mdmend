@@ -1,21 +1,53 @@
+<div align="center">
+
 # mdmend
 
-> Mend your Markdown. Instantly.
+*Mend your Markdown. Instantly.*
 
-`mdmend` is a fast, zero-dependency Markdown linter and fixer written in Go.
+Fast, zero-dependency Markdown linter and fixer. 48 rules. 38 auto-fixable.
+
+[![GitHub Release](https://img.shields.io/github/v/release/mohitmishra786/mdmend?style=flat-square&color=blue)](https://github.com/mohitmishra786/mdmend/releases)
+[![NPM Version](https://img.shields.io/npm/v/@mohitmishra7/mdmend?style=flat-square&color=007acc)](https://www.npmjs.com/package/@mohitmishra7/mdmend)
+[![Homebrew](https://img.shields.io/badge/homebrew-mohitmishra786%2Ftap%2Fmdmend-orange?style=flat-square)](https://github.com/mohitmishra786/homebrew-tap)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mohitmishra786/mdmend?style=flat-square)](https://goreportcard.com/report/github.com/mohitmishra786/mdmend)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+
+</div>
+
+---
+
+## Packages
+
+| Package | Version | Description | Link |
+| :--- | :--- | :--- | :--- |
+| **npm** | [![npm](https://img.shields.io/npm/v/@mohitmishra7/mdmend.svg?label=)](https://www.npmjs.com/package/@mohitmishra7/mdmend) | Cross-platform npm package | `npm install -g @mohitmishra7/mdmend` |
+| **Homebrew** | [![homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/mohitmishra786/homebrew-tap/main/Formula/mdmend.rb&query=$.version&label=)](https://github.com/mohitmishra786/homebrew-tap) | macOS/Linux via Homebrew | `brew install mohitmishra786/tap/mdmend` |
+| **Go** | [![go](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://pkg.go.dev/github.com/mohitmishra786/mdmend) | Go library and CLI | `go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest` |
+| **Scoop** | ![scoop](https://img.shields.io/badge/scoop-mdmend-blue) | Windows via Scoop | `scoop install mohitmishra786/mdmend` |
+| **Binary** | [![release](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://github.com/mohitmishra786/mdmend/releases) | Direct download | [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases) |
+
+---
 
 ## Installation
 
-### macOS (Homebrew)
+### npm
+
+```bash
+npm install -g @mohitmishra7/mdmend
+# or use without installing
+npx @mohitmishra7/mdmend lint .
+```
+
+### Homebrew (macOS/Linux)
 
 ```bash
 brew install mohitmishra786/tap/mdmend
 ```
 
-### Linux
+### Go
 
 ```bash
-curl -sS https://raw.githubusercontent.com/mohitmishra786/mdmend/main/scripts/install.sh | bash
+go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest
 ```
 
 ### Windows (Scoop)
@@ -25,21 +57,20 @@ scoop bucket add mohitmishra786 https://github.com/mohitmishra786/scoop-bucket
 scoop install mdmend
 ```
 
-### npm
+### Linux (curl installer)
 
 ```bash
-npm install -g @mdmend/cli
-```
-
-### Go
-
-```bash
-go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest
+curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/scripts/install.sh | bash
 ```
 
 ### Download Binary
 
-Download from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases).
+Download from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases) for your platform:
+- `mdmend_1.0.0_linux_amd64.tar.gz` — Linux x64
+- `mdmend_1.0.0_linux_arm64.tar.gz` — Linux ARM64
+- `mdmend_1.0.0_darwin_amd64.tar.gz` — macOS Intel
+- `mdmend_1.0.0_darwin_arm64.tar.gz` — macOS Apple Silicon
+- `mdmend_1.0.0_windows_amd64.zip` — Windows x64
 
 ## Quick Start
 
@@ -58,51 +89,86 @@ mdmend lint .
 
 # Get suggestions for heuristic fixes
 mdmend suggest docs/
+
+# List all available rules
+mdmend rules list
+
+# Show rule details
+mdmend rules info MD040
 ```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `mdmend fix [paths...]` | Auto-fix all fixable violations |
 | `mdmend lint [paths...]` | Report violations without fixing |
+| `mdmend fix [paths...]` | Auto-fix all fixable violations |
 | `mdmend suggest [paths...]` | Show suggested fixes for heuristic rules |
+| `mdmend rules list` | List all available rules |
+| `mdmend rules info <id>` | Show details about a specific rule |
 | `mdmend version` | Print version information |
+
+### Global Flags
+
+| Flag | Description |
+|------|-------------|
+| `--verbose` / `-v` | Per-file timing and file list |
+| `--quiet` / `-q` | Summary line only |
+| `--stats` | Per-rule violation frequency table |
+| `--only MD040,MD034` | Run only specific rules |
+| `--exit-zero` | Always exit 0 (advisory CI mode) |
+| `--max-violations N` | Fail only if violations exceed N |
+| `--output json` | JSON output format |
+| `--no-color` | Disable color output |
 
 ### Fix Command Flags
 
 | Flag | Description |
 |------|-------------|
-| `--dry-run` | Preview changes without writing |
-| `--diff` | Output unified diffs |
+| `--dry-run` / `-n` | Preview changes without writing |
+| `--diff` / `-d` | Output unified diffs |
 | `--aggressive` | Apply heuristic fixes (MD040/MD034) |
-| `--config` | Path to config file |
-| `--output json` | JSON output format |
+| `--config` / `-c` | Path to config file |
 
 ## Supported Rules
+
+48 rules total. 38 auto-fixable.
 
 ### Auto-Fixable
 
 | Rule | Description |
 |------|-------------|
+| MD003 | Heading style consistency |
+| MD004 | Unordered list style |
+| MD005 | List indentation |
+| MD007 | Unordered list indentation |
 | MD009 | Trailing spaces |
 | MD010 | Hard tabs |
 | MD011 | Reversed link syntax |
 | MD012 | Multiple blank lines |
-| MD018-MD023 | Heading formatting |
+| MD018 | No space after hash |
+| MD019 | Multiple spaces after hash |
+| MD020 | No space in closed ATX |
+| MD021 | Multiple spaces in closed ATX |
+| MD022 | Blanks around headings |
+| MD023 | Headings must start at line start |
 | MD026 | Trailing punctuation in heading |
 | MD027 | Multiple spaces after blockquote |
 | MD030 | Spaces after list markers |
 | MD031 | Fenced code blank lines |
 | MD032 | List blank lines |
 | MD035 | Horizontal rule style |
-| MD037-MD039 | Spaces in emphasis/links |
+| MD037 | Spaces inside emphasis |
+| MD038 | Spaces inside code span |
+| MD039 | Spaces inside link text |
 | MD044 | Proper names capitalization |
 | MD047 | Final newline |
 | MD048 | Code fence style |
-| MD049-MD050 | Emphasis/strong style |
+| MD049 | Emphasis style |
+| MD050 | Strong style |
 | MD053 | Unused link references |
 | MD055 | Table pipe style |
+| MD056 | Table column count |
 | MD058 | Table blank lines |
 
 ### Heuristic (Smart Inference)
@@ -111,6 +177,21 @@ mdmend suggest docs/
 |------|-------------|
 | MD034 | Bare URL wrapping |
 | MD040 | Code fence language inference |
+
+### Informational (Non-Fixable)
+
+| Rule | Description |
+|------|-------------|
+| MD013 | Line length |
+| MD024 | Duplicate headings |
+| MD025 | Multiple top-level headings |
+| MD033 | Inline HTML |
+| MD036 | Emphasis as heading |
+| MD041 | First line heading |
+| MD045 | Image alt text |
+| MD051 | Link fragments |
+| MD052 | Undefined references |
+| MD057 | Broken links |
 
 See [RULES.md](RULES.md) for complete documentation.
 
@@ -135,9 +216,7 @@ ignore:
   - "*.generated.md"
 ```
 
-## Library Usage
-
-Use mdmend as a Go library:
+## Library Usage (Go)
 
 ```go
 package main
@@ -168,9 +247,7 @@ See [pkg/mdmend](pkg/mdmend) for full API documentation.
 
 ```yaml
 - name: Lint Markdown
-  run: |
-    go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest
-    mdmend lint "**/*.md"
+  run: npx @mohitmishra7/mdmend lint . --output json
 ```
 
 ### Pre-commit Hook
@@ -180,20 +257,36 @@ See [pkg/mdmend](pkg/mdmend) for full API documentation.
 mdmend lint . || exit 1
 ```
 
+### Exit Codes for CI
+
+```bash
+# Fail only if >10 violations
+mdmend lint . --max-violations 10
+
+# Advisory mode (always exit 0)
+mdmend lint . --exit-zero
+```
+
+## Tech Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Language** | Go 1.22+ | Zero-dependency binaries, fast compilation |
+| **CLI** | Cobra | Command-line argument parsing |
+| **Glob** | doublestar | File pattern matching |
+| **Colors** | fatih/color | Terminal output coloring |
+| **Diff** | go-diff | Unified diff generation |
+| **Config** | yaml.v3 | Configuration file parsing |
+
+The tool is intentionally minimal. No framework, no runtime dependencies, just straightforward Go code that compiles to a single static binary. Each rule follows a consistent interface with `Lint()` and `Fix()` methods. Fixes are applied in phase order (Structure → Inline → Style → Heuristic → Cleanup) to avoid conflicts.
+
 ## Documentation
 
-- [SETUP.md](SETUP.md) - Development environment setup
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-- [SECURITY.md](SECURITY.md) - Security policy
-- [RULES.md](RULES.md) - Complete rules documentation
-
-## Distribution Plans
-
-- [npm Distribution](docs/NPM_DISTRIBUTION.md)
-- [Linux Distribution](docs/LINUX_DISTRIBUTION.md)
-- [Homebrew Distribution](docs/HOMEBREW_DISTRIBUTION.md)
-- [Windows Distribution](docs/WINDOWS_DISTRIBUTION.md)
+- [SETUP.md](SETUP.md) — Development environment setup
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
+- [SECURITY.md](SECURITY.md) — Security policy
+- [RULES.md](RULES.md) — Complete rules documentation
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
