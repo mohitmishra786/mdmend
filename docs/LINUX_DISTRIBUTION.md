@@ -136,8 +136,8 @@ license=('MIT')
 source_x86_64=("${url}/releases/download/v${pkgver}/mdmend_${pkgver}_linux_amd64.tar.gz")
 source_aarch64=("${url}/releases/download/v${pkgver}/mdmend_${pkgver}_linux_arm64.tar.gz")
 
-sha256sums_x86_64=('SKIP')
-sha256sums_aarch64=('SKIP')
+sha256sums_x86_64=('REPLACE_WITH_ACTUAL_SHA256')
+sha256sums_aarch64=('REPLACE_WITH_ACTUAL_SHA256')
 
 package() {
     install -Dm755 mdmend "${pkgdir}/usr/bin/mdmend"

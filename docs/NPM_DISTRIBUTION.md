@@ -8,7 +8,7 @@ The npm package `@mdmend/cli` will wrap the Go binary, downloading the appropria
 
 ## Package Structure
 
-```
+```text
 dist/npm/
 ├── package.json        # Package metadata
 ├── install.js          # Post-install script
@@ -23,27 +23,11 @@ dist/npm/
 ```json
 {
   "name": "@mdmend/cli",
-  "version": "1.0.0",
-  "description": "Fast Markdown linter and fixer",
-  "keywords": ["markdown", "linter", "fixer", "cli", "mdmend"],
-  "author": "Mohit Mishra <mohitmishra786@gmail.com>",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mohitmishra786/mdmend.git"
-  },
-  "bin": {
-    "mdmend": "./bin/mdmend"
-  },
-  "scripts": {
-    "postinstall": "node install.js"
-  },
-  "files": ["bin/", "install.js", "README.md", "LICENSE"],
+...
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
-  "os": ["darwin", "linux", "win32"],
-  "cpu": ["x64", "arm64"]
+...
 }
 ```
 

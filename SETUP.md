@@ -44,6 +44,7 @@ sudo apt install golang-go
 
 **Linux (manual)**
 ```bash
+# Download latest from https://go.dev/dl/
 wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
@@ -107,6 +108,12 @@ make self-lint
 
 ## Project Structure
 
+```text
+mdmend/
+├── cmd/
+│   └── mdmend/           # CLI application
+...
+└── go.mod                # Dependencies
 ```
 mdmend/
 ├── cmd/

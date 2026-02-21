@@ -27,7 +27,7 @@ Instead, please report them via:
    - Fill out the form with details
 
 2. **Email** (alternative)
-   - Send to: security@example.com
+   - Send to: security@mohitmishra.me
    - Subject: `[SECURITY] mdmend vulnerability report`
 
 ### What to Include
@@ -116,6 +116,6 @@ Security updates are released as patch versions and announced via:
 
 For security-related questions (non-vulnerability):
 - Open a GitHub Discussion
-- Email: security@example.com
+- Email: security@mohitmishra.me
 
 Thank you for helping keep mdmend secure.

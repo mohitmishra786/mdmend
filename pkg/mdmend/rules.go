@@ -98,6 +98,9 @@ func (a *ruleAdapter) Fix(content string, path string) rules.FixResult {
 }
 
 func EnabledRules(cfg *Config) []RuleInfo {
+	if cfg == nil {
+		cfg = DefaultConfig()
+	}
 	allRules := rules.All()
 	var result []RuleInfo
 	for _, r := range allRules {
@@ -109,6 +112,9 @@ func EnabledRules(cfg *Config) []RuleInfo {
 }
 
 func FixableRules(cfg *Config) []RuleInfo {
+	if cfg == nil {
+		cfg = DefaultConfig()
+	}
 	allRules := rules.All()
 	var result []RuleInfo
 	for _, r := range allRules {

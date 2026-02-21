@@ -5,7 +5,9 @@ REPO="mohitmishra786/mdmend"
 BINARY_NAME="mdmend"
 
 get_latest_version() {
-    curl -s "https://api.github.com/repos/${REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/'
+    local version
+    version=$(curl -s "https://api.github.com/repos/${REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+    echo "$version"
 }
 
 detect_os() {
@@ -91,8 +93,10 @@ verify_checksum() {
 
 install_binary() {
     local version="${1:-$(get_latest_version)}"
-    local os="$(detect_os)"
-    local arch="$(detect_arch)"
+    local os
+    os="$(detect_os)"
+    local arch
+    arch="$(detect_arch)"
     
     if [ "$os" = "unknown" ] || [ "$arch" = "unknown" ]; then
         echo "Unsupported platform: ${os}/${arch}"

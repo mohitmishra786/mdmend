@@ -167,9 +167,10 @@ See [pkg/mdmend](pkg/mdmend) for full API documentation.
 ### GitHub Actions
 
 ```yaml
-- uses: mohitmishra786/mdmend-action@v1
-  with:
-    args: lint "**/*.md"
+- name: Lint Markdown
+  run: |
+    go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest
+    mdmend lint "**/*.md"
 ```
 
 ### Pre-commit Hook

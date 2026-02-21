@@ -92,11 +92,27 @@ func TestClientLintString(t *testing.T) {
 				for _, v := range result.Violations {
 					if v.Rule == tt.wantRule {
 						found = true
+						if tt.wantMsgContains != "" {
+							if !strings.Contains(v.Message, tt.wantMsgContains) {
+								t.Errorf("expected message for rule %s to contain %q, got %q", tt.wantRule, tt.wantMsgContains, v.Message)
+							}
+						}
 						break
 					}
 				}
 				if !found {
 					t.Errorf("expected rule %s, got rules: %v", tt.wantRule, result.Violations)
+				}
+			} else if tt.wantMsgContains != "" {
+				found := false
+				for _, v := range result.Violations {
+					if strings.Contains(v.Message, tt.wantMsgContains) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("expected message containing %q", tt.wantMsgContains)
 				}
 			}
 
@@ -149,8 +165,8 @@ func TestClientFixString(t *testing.T) {
 			wantChange: false,
 		},
 		{
-			name:       "disabled rule not fixed",
-			content:    "# Test\n\nHello World\n",
+			name:       "disabled_rule_not_fixed",
+			content:    "# Test\n\nHello\tWorld\n",
 			path:       "test.md",
 			opts:       []Option{WithDisabledRules("MD010")},
 			wantChange: false,
@@ -477,9 +493,7 @@ func TestNewClientWithDefaults(t *testing.T) {
 }
 
 func TestClientAggressiveMode(t *testing.T) {
-	// MD040: Fenced code blocks should have a language specified
-	// MD022: Headings should be surrounded by blank lines
-	content := "# Test\n```\ncode\n```\n"
+	content := "# Test\n\n```\ncode\n```\n"
 
 	normalClient := NewClient()
 	normalResult := normalClient.FixString(content, "test.md")
@@ -487,19 +501,20 @@ func TestClientAggressiveMode(t *testing.T) {
 	aggressiveClient := NewClient(WithAggressiveMode(true))
 	aggressiveResult := aggressiveClient.FixString(content, "test.md")
 
-	// Normal fix should handle MD022 (blank line after heading)
-	// but not MD040 (unless aggressive)
 	if !normalResult.Changed {
-		t.Error("expected normal result to have some changes (MD022)")
+		t.Error("expected normal mode to fix MD040 (add language to code fence)")
 	}
 
-	// Aggressive fix should handle both
 	if !aggressiveResult.Changed {
-		t.Error("expected aggressive result to have changes")
+		t.Error("expected aggressive mode to fix MD040")
 	}
 
-	if len(aggressiveResult.Violations) >= len(normalResult.Violations) && len(normalResult.Violations) > 0 {
-		// This is a bit weak because both might fix MD022, but aggressive should fix more
+	if !strings.Contains(normalResult.Content, "text") {
+		t.Errorf("expected normal mode to add language, got: %q", normalResult.Content)
+	}
+
+	if !strings.Contains(aggressiveResult.Content, "text") {
+		t.Errorf("expected aggressive mode to add language, got: %q", aggressiveResult.Content)
 	}
 }
 
@@ -589,6 +604,38 @@ func TestConvenienceFunctions(t *testing.T) {
 		}
 		if !result.Changed {
 			t.Error("expected changes")
+		}
+	})
+
+	t.Run("LintFiles", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		testFile := filepath.Join(tmpDir, "test.md")
+		if err := os.WriteFile(testFile, []byte("# Test\nHello\tWorld\n"), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		results, err := LintFiles([]string{tmpDir})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(results) != 1 || len(results[0].Violations) == 0 {
+			t.Error("expected violations in results")
+		}
+	})
+
+	t.Run("FixFiles", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		testFile := filepath.Join(tmpDir, "test.md")
+		if err := os.WriteFile(testFile, []byte("# Test\nHello World  \n"), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		results, err := FixFiles([]string{tmpDir})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(results) != 1 || !results[0].Changed {
+			t.Error("expected changes in results")
 		}
 	})
 }

@@ -64,7 +64,10 @@ type RuleError struct {
 }
 
 func (e *RuleError) Error() string {
-	return "rule " + e.RuleID + ": " + e.Err.Error()
+	if e.RuleID != "" {
+		return "rule " + e.RuleID + ": " + e.Err.Error()
+	}
+	return "rule: " + e.Err.Error()
 }
 
 func (e *RuleError) Unwrap() error {
