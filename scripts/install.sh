@@ -119,9 +119,10 @@ install_binary() {
     local checksum_url="https://github.com/${REPO}/releases/download/v${version}/checksums.txt"
     local tmp_dir
     tmp_dir=$(mktemp -d)
+    local cleanup_dir="$tmp_dir"
     
     # Ensure cleanup
-    trap 'rm -rf "$tmp_dir"' EXIT
+    trap "rm -rf '$cleanup_dir'" EXIT
     
     local tmp_file="${tmp_dir}/mdmend.${ext}"
     
@@ -143,9 +144,15 @@ install_binary() {
     fi
     
     echo "Installing mdmend to /usr/local/bin..."
-    sudo mkdir -p /usr/local/bin
-    sudo mv "$BINARY_NAME" /usr/local/bin/mdmend
-    sudo chmod +x /usr/local/bin/mdmend
+    if [ "$os" = "windows" ]; then
+        mkdir -p /usr/local/bin
+        mv "$BINARY_NAME" /usr/local/bin/mdmend
+        chmod +x /usr/local/bin/mdmend
+    else
+        sudo mkdir -p /usr/local/bin
+        sudo mv "$BINARY_NAME" /usr/local/bin/mdmend
+        sudo chmod +x /usr/local/bin/mdmend
+    fi
     
     echo "mdmend v${version} installed successfully!"
 }

@@ -7,13 +7,14 @@ import (
 type Option func(*clientOptions)
 
 type clientOptions struct {
-	cfg        *config.Config
-	configPath string
-	disabled   []string
-	ignore     []string
-	tabSize    int
-	aggressive bool
-	dryRun     bool
+	cfg           *config.Config
+	configPath    string
+	disabled      []string
+	ignore        []string
+	tabSize       int
+	aggressive    *bool
+	dryRun        *bool
+	ruleOverrides map[string]config.RuleConfig
 }
 
 func WithConfig(cfg *Config) Option {
@@ -53,13 +54,15 @@ func WithTabSize(size int) Option {
 
 func WithAggressiveMode(enabled bool) Option {
 	return func(o *clientOptions) {
-		o.aggressive = enabled
+		v := enabled
+		o.aggressive = &v
 	}
 }
 
 func WithDryRun(enabled bool) Option {
 	return func(o *clientOptions) {
-		o.dryRun = enabled
+		v := enabled
+		o.dryRun = &v
 	}
 }
 
@@ -68,13 +71,10 @@ func WithDryRun(enabled bool) Option {
 // as WithConfig replaces the entire configuration object.
 func WithRuleConfig(ruleID string, rc RuleConfig) Option {
 	return func(o *clientOptions) {
-		if o.cfg == nil {
-			o.cfg = config.Default()
+		if o.ruleOverrides == nil {
+			o.ruleOverrides = make(map[string]config.RuleConfig)
 		}
-		if o.cfg.Rules == nil {
-			o.cfg.Rules = make(map[string]config.RuleConfig)
-		}
-		o.cfg.Rules[ruleID] = toInternalRuleConfig(rc)
+		o.ruleOverrides[ruleID] = toInternalRuleConfig(rc)
 	}
 }
 

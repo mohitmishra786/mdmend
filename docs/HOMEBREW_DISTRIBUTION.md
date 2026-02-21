@@ -57,7 +57,7 @@ class Mdmend < Formula
   end
 
   test do
-    assert_match "mdmend version", shell_output("#{bin}/mdmend --version")
+    assert_match(/mdmend\s+/, shell_output("#{bin}/mdmend --version"))
 
     test_file = testpath/"test.md"
     test_file.write "# Test\n\nHello\tWorld\n"

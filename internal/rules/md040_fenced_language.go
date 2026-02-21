@@ -57,11 +57,6 @@ func (r *MD040) Fix(content string, path string) FixResult {
 	inCodeBlock := false
 	var codeBlockContent []string
 	codeBlockStart := -1
-	var prevLines []string
-
-	for i := 0; i < len(lines); i++ {
-		prevLines = lines[max(0, i-5):i]
-	}
 
 	for i, line := range lines {
 		trimmed := strings.TrimSpace(line)
@@ -75,6 +70,7 @@ func (r *MD040) Fix(content string, path string) FixResult {
 				}
 			} else {
 				if codeBlockStart >= 0 && len(codeBlockContent) > 0 {
+					prevLines := lines[max(0, codeBlockStart-5):codeBlockStart]
 					inferred := inferrer.InferLanguage(codeBlockContent, prevLines)
 					confidence := inferred.Confidence
 					if confidence < r.Confidence && !r.Aggressive {

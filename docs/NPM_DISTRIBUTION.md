@@ -72,10 +72,7 @@ function getDownloadUrl(version) {
   const platform = getPlatform();
   const arch = getArch();
   const ext = platform === 'windows' ? 'zip' : 'tar.gz';
-  const basePath = version === 'latest' 
-    ? 'releases/latest/download' 
-    : `releases/download/v${version}`;
-  return `https://github.com/${GITHUB_REPO}/${basePath}/mdmend_${version}_${platform}_${arch}.${ext}`;
+  return `https://github.com/${GITHUB_REPO}/releases/download/v${version}/mdmend_${version}_${platform}_${arch}.${ext}`;
 }
 
 async function getLatestTag() {

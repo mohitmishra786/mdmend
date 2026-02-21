@@ -64,6 +64,9 @@ LATEST=$(curl -s https://api.github.com/repos/mohitmishra786/mdmend/releases/lat
 
 curl -sSL "${REPO_URL}/download/v${LATEST}/mdmend_${LATEST}_linux_${ARCH}.deb" -o /tmp/mdmend.deb
 
+# Note: Add checksum verification here in production
+# curl -sSL "${REPO_URL}/download/v${LATEST}/checksums.txt" | grep "mdmend_${LATEST}_linux_${ARCH}.deb" | sha256sum -c -
+
 sudo dpkg -i /tmp/mdmend.deb
 rm /tmp/mdmend.deb
 
@@ -328,7 +331,7 @@ jobs:
       
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.22'
       
       - uses: goreleaser/goreleaser-action@v5
         with:

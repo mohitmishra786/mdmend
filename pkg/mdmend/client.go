@@ -43,13 +43,28 @@ func NewClient(opts ...Option) *Client {
 	if options.tabSize > 0 {
 		cfg.TabSize = options.tabSize
 	}
-	if options.aggressive {
-		cfg.Aggressive = true
+	if options.aggressive != nil {
+		cfg.Aggressive = *options.aggressive
+	}
+
+	// Apply rule overrides after config is resolved
+	if len(options.ruleOverrides) > 0 {
+		if cfg.Rules == nil {
+			cfg.Rules = make(map[string]config.RuleConfig)
+		}
+		for ruleID, ruleCfg := range options.ruleOverrides {
+			cfg.Rules[ruleID] = ruleCfg
+		}
+	}
+
+	dryRun := false
+	if options.dryRun != nil {
+		dryRun = *options.dryRun
 	}
 
 	return &Client{
 		cfg:             cfg,
-		dryRun:          options.dryRun,
+		dryRun:          dryRun,
 		ConfigLoadError: loadErr,
 	}
 }

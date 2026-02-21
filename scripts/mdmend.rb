@@ -54,9 +54,10 @@ class Mdmend < Formula
     output = shell_output("#{bin}/mdmend fix --dry-run #{test_file}")
     assert_match "MD010", output
   end
+
+  # NOTE: The sha256 values above are placeholders and must be updated 
+  # with actual checksums for each release. Compute them using:
+  #   curl -sL https://github.com/mohitmishra786/mdmend/releases/download/v1.0.0/checksums.txt
+  # Or download the tarball and run:
+  #   shasum -a 256 mdmend_1.0.0_*.tar.gz
 end
-# NOTE: The sha256 values above are placeholders and must be updated 
-# with actual checksums for each release. Compute them using:
-#   curl -sL https://github.com/mohitmishra786/mdmend/releases/download/v1.0.0/checksums.txt
-# Or download the tarball and run:
-#   shasum -a 256 mdmend_1.0.0_*.tar.gz
