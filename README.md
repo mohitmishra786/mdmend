@@ -21,7 +21,7 @@ Fast, zero-dependency Markdown linter and fixer. 48 rules. 38 auto-fixable.
 | Package | Version | Description | Link |
 | :--- | :--- | :--- | :--- |
 | **npm** | [![npm](https://img.shields.io/npm/v/@mohitmishra7/mdmend.svg?label=)](https://www.npmjs.com/package/@mohitmishra7/mdmend) | Cross-platform npm package | `npm install -g @mohitmishra7/mdmend` |
-| **Homebrew** | [![homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/mohitmishra786/homebrew-tap/main/Formula/mdmend.rb&query=$.version&label=)](https://github.com/mohitmishra786/homebrew-tap) | macOS/Linux via Homebrew | `brew install mohitmishra786/tap/mdmend` |
+| **Homebrew** | [![homebrew](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=&color=orange)](https://github.com/mohitmishra786/homebrew-tap) | macOS/Linux via Homebrew | `brew install mohitmishra786/tap/mdmend` |
 | **Go** | [![go](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://pkg.go.dev/github.com/mohitmishra786/mdmend) | Go library and CLI | `go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest` |
 | **Scoop** | ![scoop](https://img.shields.io/badge/scoop-mdmend-blue) | Windows via Scoop | `scoop install mohitmishra786/mdmend` |
 | **DEB** | [![deb](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://github.com/mohitmishra786/mdmend/releases) | Debian/Ubuntu | `curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/apt/install.sh \| bash` |
