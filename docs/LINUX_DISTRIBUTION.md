@@ -6,12 +6,15 @@ This document outlines the plan for distributing mdmend on Linux platforms.
 
 mdmend will be distributed on Linux through multiple channels:
 
-- DEB packages (Debian, Ubuntu)
-- RPM packages (RHEL, Fedora, CentOS)
-- AUR (Arch Linux)
-- Snap (Universal)
-- AppImage (Portable)
-- Direct binary download
+- **DEB packages** (Debian, Ubuntu) — via GoReleaser nfpm
+- **RPM packages** (RHEL, Fedora, CentOS) — via GoReleaser nfpm
+- **APK packages** (Alpine Linux) — via GoReleaser nfpm
+- **AUR** (Arch Linux) — via GoReleaser aur integration
+- **Snap** (Universal) — via GoReleaser snapcraft
+- **Flatpak** (Universal) — via manual manifest
+- **Direct binary download** — via GitHub Releases
+
+All packaging files are located in `packaging/` directory.
 
 ## 1. DEB Package (Debian/Ubuntu)
 

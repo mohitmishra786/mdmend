@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="console-application">
+  <id>io.github.mohitmishra786.mdmend</id>
+  <name>mdmend</name>
+  <summary>Fast Markdown linter and fixer</summary>
+  <developer id="io.github.mohitmishra786">
+    <name>Mohit Mishra</name>
+  </developer>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <project_group>mdmend</project_group>
+  <description>
+    <p>
+      mdmend is a fast, zero-dependency Markdown linter and fixer that
+      automatically fixes common Markdown linting issues.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>48 markdown lint rules</li>
+      <li>38 auto-fixable violations</li>
+      <li>Intelligent language detection for code fences (MD040)</li>
+      <li>Smart bare URL wrapping (MD034)</li>
+      <li>Zero runtime dependencies</li>
+      <li>Fast parallel processing</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github.mohitmishra786.mdmend.desktop</launchable>
+  <categories>
+    <category>Development</category>
+    <category>TextTools</category>
+    <category>ConsoleOnly</category>
+  </categories>
+  <keywords>
+    <keyword>markdown</keyword>
+    <keyword>linter</keyword>
+    <keyword>fixer</keyword>
+    <keyword>format</keyword>
+    <keyword>cli</keyword>
+  </keywords>
+  <url type="homepage">https://github.com/mohitmishra786/mdmend</url>
+  <url type="bugtracker">https://github.com/mohitmishra786/mdmend/issues</url>
+  <url type="vcs-browser">https://github.com/mohitmishra786/mdmend</url>
+  <releases>
+    <release version="1.0.0" date="2024-01-01">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
+  <content_rating type="oars-1.1"/>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </recommends>
+</component>

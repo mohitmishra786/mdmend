@@ -64,14 +64,78 @@ brews:
       bin.install "mdmend"
 
 nfpms:
-  - file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - id: deb
+    package_name: mdmend
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     homepage: https://github.com/mohitmishra786/mdmend
-    description: "Fix Markdown lint violations across all files, instantly."
+    description: "Fast, zero-dependency Markdown linter and fixer"
     license: MIT
+    maintainer: Mohit Mishra <mohitmishra786@gmail.com>
     formats:
       - deb
+    dependencies:
+      - git
+    contents:
+      - src: ./LICENSE
+        dst: /usr/share/doc/mdmend/LICENSE
+      - src: ./README.md
+        dst: /usr/share/doc/mdmend/README.md
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
+
+  - id: rpm
+    package_name: mdmend
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    homepage: https://github.com/mohitmishra786/mdmend
+    description: "Fast, zero-dependency Markdown linter and fixer"
+    license: MIT
+    maintainer: Mohit Mishra <mohitmishra786@gmail.com>
+    formats:
       - rpm
-    maintainer: Your Name <your@email.com>
+    rpm:
+      group: Development/Tools
+      packager: Mohit Mishra <mohitmishra786@gmail.com>
+
+  - id: apk
+    package_name: mdmend
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    homepage: https://github.com/mohitmishra786/mdmend
+    description: "Fast, zero-dependency Markdown linter and fixer"
+    license: MIT
+    maintainer: Mohit Mishra <mohitmishra786@gmail.com>
+    formats:
+      - apk
+
+aurs:
+  - name: mdmend-bin
+    homepage: https://github.com/mohitmishra786/mdmend
+    description: "Fast, zero-dependency Markdown linter and fixer"
+    maintainers:
+      - 'Mohit Mishra <mohitmishra786@gmail.com>'
+    license: MIT
+    private_key: '{{ .Env.AUR_KEY }}'
+    git_url: 'ssh://aur@aur.archlinux.org/mdmend-bin.git'
+    skip_archive: mdmend
+    package: |-
+      install -Dm755 mdmend "${pkgdir}/usr/bin/mdmend"
+      install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+snapcrafts:
+  - name: mdmend
+    summary: "Fast Markdown linter and fixer"
+    description: |
+      mdmend is a fast, zero-dependency Markdown linter and fixer that
+      automatically fixes common Markdown linting issues. Supports 48 rules
+      with 38 auto-fixable violations.
+    grade: stable
+    confinement: classic
+    license: MIT
+    base: core22
+    apps:
+      mdmend:
+        command: mdmend
 
 scoops:
   - repository:

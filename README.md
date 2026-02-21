@@ -24,6 +24,11 @@ Fast, zero-dependency Markdown linter and fixer. 48 rules. 38 auto-fixable.
 | **Homebrew** | [![homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/mohitmishra786/homebrew-tap/main/Formula/mdmend.rb&query=$.version&label=)](https://github.com/mohitmishra786/homebrew-tap) | macOS/Linux via Homebrew | `brew install mohitmishra786/tap/mdmend` |
 | **Go** | [![go](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://pkg.go.dev/github.com/mohitmishra786/mdmend) | Go library and CLI | `go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest` |
 | **Scoop** | ![scoop](https://img.shields.io/badge/scoop-mdmend-blue) | Windows via Scoop | `scoop install mohitmishra786/mdmend` |
+| **DEB** | [![deb](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://github.com/mohitmishra786/mdmend/releases) | Debian/Ubuntu | `curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/apt/install.sh \| bash` |
+| **RPM** | [![rpm](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://github.com/mohitmishra786/mdmend/releases) | Fedora/RHEL/CentOS | `curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/yum/install.sh \| bash` |
+| **AUR** | ![aur](https://img.shields.io/badge/aur-mdmend--bin-blue) | Arch Linux | `yay -S mdmend-bin` |
+| **Snap** | ![snap](https://img.shields.io/badge/snap-mdmend-blue) | Universal Linux | `sudo snap install mdmend` |
+| **Alpine** | ![alpine](https://img.shields.io/badge/alpine-mdmend-blue) | Alpine Linux | See [docs](docs/LINUX_DISTRIBUTION.md) |
 | **Binary** | [![release](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://github.com/mohitmishra786/mdmend/releases) | Direct download | [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases) |
 
 ---
@@ -55,6 +60,56 @@ go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest
 ```powershell
 scoop bucket add mohitmishra786 https://github.com/mohitmishra786/scoop-bucket
 scoop install mdmend
+```
+
+### Debian/Ubuntu (apt)
+
+```bash
+# Install via script
+curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/apt/install.sh | bash
+
+# Or download .deb directly
+curl -sSL https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.0_linux_amd64.deb -o mdmend.deb
+sudo dpkg -i mdmend.deb
+```
+
+### Fedora/RHEL/CentOS (yum/dnf)
+
+```bash
+# Install via script
+curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/yum/install.sh | bash
+
+# Or download .rpm directly
+sudo dnf install https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.0_linux_amd64.rpm
+```
+
+### Arch Linux (AUR)
+
+```bash
+# Using yay
+yay -S mdmend-bin
+
+# Using paru
+paru -S mdmend-bin
+
+# Manual
+git clone https://aur.archlinux.org/mdmend-bin.git
+cd mdmend-bin && makepkg -si
+```
+
+### Snap
+
+```bash
+sudo snap install mdmend
+```
+
+### Alpine Linux (apk)
+
+```bash
+# Using abuild (from source)
+wget https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/alpine/APKBUILD
+abuild -r
+sudo apk add --allow-untrusted ~/packages/mdmend-*.apk
 ```
 
 ### Linux (curl installer)

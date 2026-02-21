@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=mdmend
+GenericName=Markdown Linter
+Comment=Fast Markdown linter and fixer
+Exec=mdmend
+Icon=io.github.mohitmishra786.mdmend
+Type=Application
+Categories=Development;TextTools;
+Keywords=markdown;linter;fixer;format;cli;
+Terminal=true
+NoDisplay=true

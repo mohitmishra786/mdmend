@@ -1,0 +1,54 @@
+# Maintainer: Mohit Mishra <mohitmishra786@gmail.com>
+pkgname=mdmend
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Fast, zero-dependency Markdown linter and fixer"
+url="https://github.com/mohitmishra786/mdmend"
+arch="x86_64 aarch64"
+license="MIT"
+depends=""
+makedepends="go"
+subpackages="$pkgname-doc $pkgname-bash-completion"
+source="https://github.com/mohitmishra786/mdmend/archive/v$pkgver/mdmend-$pkgver.tar.gz"
+
+export CGO_ENABLED=0
+export GOCACHE="${GOCACHE:-"$srcdir/go-cache"}"
+export GOTMPDIR="${GOTMPDIR:-"$srcdir"}"
+export GOMODCACHE="${GOMODCACHE:-"$srcdir/go-mod"}"
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver"
+    
+    go build -ldflags "-s -w -X main.version=$pkgver" -o mdmend ./cmd/mdmend
+    
+    ./mdmend completion bash > completions-mdmend.bash || echo "# bash completions" > completions-mdmend.bash
+}
+
+check() {
+    cd "$srcdir/$pkgname-$pkgver"
+    go test ./...
+    ./mdmend version
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver"
+    
+    install -Dm755 mdmend "$pkgdir"/usr/bin/mdmend
+    
+    install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+    
+    install -Dm644 README.md "$pkgdir"/usr/share/doc/$pkgname/README.md
+    
+    install -Dm644 .mdmend.yml "$pkgdir"/usr/share/doc/$pkgname/.mdmend.yml
+}
+
+bashcomp() {
+    depends=""
+    pkgdesc="Bash completions for $pkgname"
+    install_if="$pkgname=$pkgver-r$pkgrel bash-completion"
+    
+    cd "$srcdir/$pkgname-$pkgver"
+    install -Dm644 completions-mdmend.bash "$subpkgdir"/usr/share/bash-completion/completions/mdmend
+}
+
+sha256sums="SKIP"

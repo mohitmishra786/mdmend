@@ -1,0 +1,51 @@
+name: mdmend
+version: '1.0.0'
+summary: Fast Markdown linter and fixer
+description: |
+  mdmend is a fast, zero-dependency Markdown linter and fixer that
+  automatically fixes common Markdown linting issues. Supports 48 rules
+  with 38 auto-fixable violations.
+  
+  Features:
+  - 48 markdown lint rules
+  - 38 auto-fixable violations
+  - Intelligent language detection for code fences (MD040)
+  - Smart bare URL wrapping (MD034)
+  - Zero runtime dependencies
+  - Fast parallel processing
+
+base: core22
+grade: stable
+confinement: classic
+license: MIT
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+
+apps:
+  mdmend:
+    command: bin/mdmend
+    completer: completions/mdmend.bash
+
+parts:
+  mdmend:
+    plugin: go
+    source: https://github.com/mohitmishra786/mdmend.git
+    source-tag: v1.0.0
+    build-snaps:
+      - go
+    build-environment:
+      - CGO_ENABLED: "0"
+    override-build: |
+      go build -ldflags "-s -w -X main.version=${SNAPCRAFT_PROJECT_VERSION}" -o $SNAPCRAFT_PART_INSTALL/bin/mdmend ./cmd/mdmend
+      
+      mkdir -p $SNAPCRAFT_PART_INSTALL/completions
+      $SNAPCRAFT_PART_INSTALL/bin/mdmend completion bash > $SNAPCRAFT_PART_INSTALL/completions/mdmend.bash || true
+    organize:
+      bin/mdmend: bin/mdmend
+
+lint:
+  ignore:
+    - classic
+    - library

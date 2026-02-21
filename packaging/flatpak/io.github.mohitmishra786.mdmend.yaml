@@ -1,0 +1,29 @@
+app-id: io.github.mohitmishra786.mdmend
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: mdmend
+
+finish-args:
+  - --filesystem=host
+  - --filesystem=xdg-config/mdmend:create
+  - --filesystem=xdg-cache/mdmend:create
+
+modules:
+  - name: mdmend
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 mdmend ${FLATPAK_DEST}/bin/mdmend
+      - install -Dm644 LICENSE ${FLATPAK_DEST}/share/licenses/mdmend/LICENSE
+      - install -Dm644 README.md ${FLATPAK_DEST}/share/doc/mdmend/README.md
+      - install -Dm644 packaging/flatpak/io.github.mohitmishra786.mdmend.metainfo.xml ${FLATPAK_DEST}/share/metainfo/io.github.mohitmishra786.mdmend.metainfo.xml
+      - install -Dm644 packaging/flatpak/io.github.mohitmishra786.mdmend.desktop ${FLATPAK_DEST}/share/applications/io.github.mohitmishra786.mdmend.desktop
+      - install -Dm644 packaging/flatpak/io.github.mohitmishra786.mdmend.svg ${FLATPAK_DEST}/share/icons/hicolor/scalable/apps/io.github.mohitmishra786.mdmend.svg
+    sources:
+      - type: archive
+        url: https://github.com/mohitmishra786/mdmend/releases/download/v1.0.0/mdmend_1.0.0_linux_amd64.tar.gz
+        sha256: SKIP
+        dest-filename: mdmend.tar.gz
+      - type: shell
+        commands:
+          - tar -xzf mdmend.tar.gz
