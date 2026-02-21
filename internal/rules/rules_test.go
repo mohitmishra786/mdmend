@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -1337,5 +1338,1156 @@ func TestMD034SkipPatterns(t *testing.T) {
 	result := rule.Fix(content, "test.md")
 	if result.Changed {
 		t.Error("MD034.Fix() should skip URLs matching skip patterns")
+	}
+}
+
+func TestMD003(t *testing.T) {
+	rule := &MD003{Style: "atx"}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"pure ATX", "# Heading\n", 0},
+		{"setext H1", "Heading\n===\n", 1},
+		{"setext H2", "Heading\n---\n", 1},
+		{"mixed styles", "# ATX\nSetext\n---\n", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD003.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD003Fix(t *testing.T) {
+	rule := &MD003{Style: "atx"}
+
+	tests := []struct {
+		name    string
+		input   string
+		wantFix string
+	}{
+		{"setext H1 to ATX", "Heading\n===\n", "# Heading\n"},
+		{"setext H2 to ATX", "Heading\n---\n", "## Heading\n"},
+		{"already ATX", "# Heading\n", "# Heading\n"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := rule.Fix(tt.input, "test.md")
+			if result.Content() != tt.wantFix {
+				t.Errorf("MD003.Fix() = %q, want %q", result.Content(), tt.wantFix)
+			}
+		})
+	}
+}
+
+func TestMD004(t *testing.T) {
+	rule := &MD004{Style: "dash"}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"dash list", "- item\n", 0},
+		{"asterisk list", "* item\n", 1},
+		{"plus list", "+ item\n", 1},
+		{"no list", "text\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD004.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD004Fix(t *testing.T) {
+	rule := &MD004{Style: "dash"}
+
+	tests := []struct {
+		name    string
+		input   string
+		wantFix string
+	}{
+		{"asterisk to dash", "* item\n", "- item\n"},
+		{"plus to dash", "+ item\n", "- item\n"},
+		{"dash unchanged", "- item\n", "- item\n"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := rule.Fix(tt.input, "test.md")
+			if result.Content() != tt.wantFix {
+				t.Errorf("MD004.Fix() = %q, want %q", result.Content(), tt.wantFix)
+			}
+		})
+	}
+}
+
+func TestMD005(t *testing.T) {
+	rule := &MD005{}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"consistent indent", "- item\n  - nested\n", 0},
+		{"single list", "- item\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD005.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD007(t *testing.T) {
+	rule := &MD007{Indent: 2}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"correct indent", "- item\n  - nested\n", 0},
+		{"single item", "- item\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD007.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD007Fix(t *testing.T) {
+	rule := &MD007{Indent: 2}
+
+	input := "- item\n    - nested\n"
+	result := rule.Fix(input, "test.md")
+	if !result.Changed {
+		t.Error("MD007.Fix() should normalize indentation")
+	}
+}
+
+func TestMD013(t *testing.T) {
+	rule := &MD013{LineLength: 80, Enabled: true, CodeBlocks: false, Tables: false}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"short line", "short line\n", 0},
+		{"long line", "this is a very long line that exceeds the eighty character limit by a lot of text here\n", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD013.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD013Disabled(t *testing.T) {
+	rule := &MD013{Enabled: false}
+
+	input := "this is a very long line that exceeds the eighty character limit for sure\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD013.Lint() should return no violations when disabled")
+	}
+}
+
+func TestMD014(t *testing.T) {
+	rule := &MD014{Enabled: true, Smart: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"bash with $", "```bash\n$ echo hi\n```\n", 1},
+		{"bash without $", "```bash\necho hi\n```\n", 0},
+		{"no lang with $", "```\n$ echo hi\n```\n", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD014.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD014Fix(t *testing.T) {
+	rule := &MD014{Enabled: true, Smart: true}
+
+	input := "```bash\n$ echo hi\n```\n"
+	result := rule.Fix(input, "test.md")
+	if !result.Changed {
+		t.Error("MD014.Fix() should remove $ prefix")
+	}
+}
+
+func TestMD024(t *testing.T) {
+	rule := &MD024{AllowDifferentNesting: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"unique headings", "# One\n## Two\n", 0},
+		{"duplicate same level", "# Heading\n## Heading\n", 0},
+		{"no headings", "text\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD024.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD025(t *testing.T) {
+	rule := &MD025{Level: 1, FrontMatter: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"single H1", "# Title\n## Section\n", 0},
+		{"multiple H1", "# Title 1\n# Title 2\n", 1},
+		{"no H1", "## Section\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD025.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD028(t *testing.T) {
+	rule := &MD028{Enabled: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"continuous blockquote", "> Line 1\n> Line 2\n", 0},
+		{"no blockquote", "text\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD028.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD028Fix(t *testing.T) {
+	rule := &MD028{Enabled: true}
+
+	input := "> Line 1\n\n> Line 2\n"
+	result := rule.Fix(input, "test.md")
+	if !result.Changed {
+		t.Error("MD028.Fix() should fix blank lines in blockquotes")
+	}
+}
+
+func TestMD033(t *testing.T) {
+	rule := &MD033{Enabled: false}
+
+	input := "<div>HTML</div>\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD033.Lint() should return no violations when disabled")
+	}
+}
+
+func TestMD033Enabled(t *testing.T) {
+	rule := &MD033{Enabled: true, AllowedTags: []string{}}
+
+	input := "<div>HTML</div>\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) == 0 {
+		t.Error("MD033.Lint() should detect HTML when enabled")
+	}
+}
+
+func TestMD036(t *testing.T) {
+	rule := &MD036{Suggest: false}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"emphasis as heading", "**Bold Text**\n", 1},
+		{"normal emphasis", "Some **bold** text\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD036.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD041(t *testing.T) {
+	rule := &MD041{DeriveFromFilename: true, PromoteFirst: true, FrontMatter: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"has H1", "# Title\nContent\n", 0},
+		{"no H1", "Content\n", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD041.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD041Fix(t *testing.T) {
+	rule := &MD041{DeriveFromFilename: true, PromoteFirst: false, FrontMatter: false}
+
+	input := "Content\n"
+	result := rule.Fix(input, "test-file.md")
+	if !result.Changed {
+		t.Error("MD041.Fix() should add H1 from filename")
+	}
+}
+
+func TestMD042(t *testing.T) {
+	rule := &MD042{}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"empty link", "[text]()\n", 1},
+		{"valid link", "[text](url)\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD042.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD043(t *testing.T) {
+	rule := &MD043{Headings: []string{}}
+
+	input := "# Title\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD043.Lint() should return no violations when no headings configured")
+	}
+}
+
+func TestMD043WithHeadings(t *testing.T) {
+	rule := &MD043{Headings: []string{"# Title", "## Usage"}}
+
+	input := "# Title\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) == 0 {
+		t.Error("MD043.Lint() should detect missing required headings")
+	}
+}
+
+func TestMD045(t *testing.T) {
+	rule := &MD045{Suggest: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"no alt text", "![](image.png)\n", 1},
+		{"has alt text", "![Alt text](image.png)\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD045.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD051(t *testing.T) {
+	rule := &MD051{SuggestClosest: true, Aggressive: false}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"valid fragment", "# Heading\n[link](#heading)\n", 0},
+		{"invalid fragment", "# Heading\n[link](#missing)\n", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD051.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD051Fix(t *testing.T) {
+	rule := &MD051{SuggestClosest: true, Aggressive: true}
+
+	input := "# Installation\n[link](#instalation)\n"
+	result := rule.Fix(input, "test.md")
+	if !result.Changed {
+		t.Error("MD051.Fix() should fix typo in fragment")
+	}
+}
+
+func TestMD052(t *testing.T) {
+	rule := &MD052{}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"undefined ref", "[text][ref]\n", 1},
+		{"defined ref", "[text][ref]\n[ref]: url\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD052.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD056(t *testing.T) {
+	rule := &MD056{PadShortRows: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"valid table", "| A | B |\n|---|---|\n| 1 | 2 |\n", 0},
+		{"short row", "| A | B |\n|---|---|\n| 1 |\n", 1},
+		{"long row", "| A | B |\n|---|---|\n| 1 | 2 | 3 |\n", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD056.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD056Fix(t *testing.T) {
+	rule := &MD056{PadShortRows: true}
+
+	input := "| A | B |\n|---|---|\n| 1 |\n"
+	result := rule.Fix(input, "test.md")
+	if !result.Changed {
+		t.Error("MD056.Fix() should pad short rows")
+	}
+}
+
+func TestMD057(t *testing.T) {
+	rule := &MD057{SuggestClosest: true}
+
+	input := "[link](./missing.md)\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) == 0 {
+		t.Error("MD057.Lint() should detect broken relative link")
+	}
+}
+
+func TestMD003EdgeCases(t *testing.T) {
+	rule := &MD003{Style: "atx"}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"empty file", "", 0},
+		{"horizontal rule", "---\n", 0},
+		{"ATX heading", "# Heading\n", 0},
+		{"mixed ATX", "# H1\n## H2\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD003.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD004EdgeCases(t *testing.T) {
+	rule := &MD004{Style: "dash"}
+
+	tests := []struct {
+		name    string
+		input   string
+		wantFix string
+	}{
+		{"nested lists", "- item\n  * nested\n", "- item\n  - nested\n"},
+		{"in code block", "```\n* item\n```\n", "```\n* item\n```\n"},
+		{"emphasis not list", "text *emphasis* more\n", "text *emphasis* more\n"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := rule.Fix(tt.input, "test.md")
+			if result.Content() != tt.wantFix {
+				t.Errorf("MD004.Fix() = %q, want %q", result.Content(), tt.wantFix)
+			}
+		})
+	}
+}
+
+func TestMD005Fix(t *testing.T) {
+	rule := &MD005{}
+
+	input := "- item\n  - nested\n   - uneven\n"
+	result := rule.Fix(input, "test.md")
+	if !result.Changed {
+		t.Error("MD005.Fix() should normalize indentation")
+	}
+}
+
+func TestMD007EdgeCases(t *testing.T) {
+	rule := &MD007{Indent: 2}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"in code block", "```\n- item\n    - nested\n```\n", 0},
+		{"ordered list", "1. item\n   1. nested\n", 0},
+		{"no indent issues", "- item\n  - nested\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD007.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD013EdgeCases(t *testing.T) {
+	rule := &MD013{LineLength: 80, Enabled: true, CodeBlocks: false, Tables: false}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"url skipped", "https://example.com/very/long/path/that/exceeds/limit/here\n", 0},
+		{"short line", "short\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD013.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD014EdgeCases(t *testing.T) {
+	rule := &MD014{Enabled: true, Smart: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"disabled", "```bash\n$ cmd\n```\n", 1},
+		{"continuation lines", "```bash\n$ cmd \\\n> continuation\n```\n", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD014.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD014Disabled(t *testing.T) {
+	rule := &MD014{Enabled: false}
+
+	input := "```bash\n$ cmd\n```\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD014.Lint() should return no violations when disabled")
+	}
+}
+
+func TestMD024AllLevels(t *testing.T) {
+	rule := &MD024{AllowDifferentNesting: false}
+
+	input := "# Heading\n## Heading\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) == 0 {
+		t.Error("MD024.Lint() should detect duplicate at different levels when AllowDifferentNesting is false")
+	}
+}
+
+func TestMD024Setext(t *testing.T) {
+	rule := &MD024{AllowDifferentNesting: true}
+
+	input := "Heading\n---\nHeading\n---\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) == 0 {
+		t.Error("MD024.Lint() should detect duplicate setext headings")
+	}
+}
+
+func TestMD025FrontMatter(t *testing.T) {
+	rule := &MD025{Level: 1, FrontMatter: true}
+
+	input := "---\ntitle: Test\n---\n# Title 1\n# Title 2\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) == 0 {
+		t.Error("MD025.Lint() should detect multiple H1s even with front matter")
+	}
+}
+
+func TestMD028Disabled(t *testing.T) {
+	rule := &MD028{Enabled: false}
+
+	input := "> Line 1\n\n> Line 2\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD028.Lint() should return no violations when disabled")
+	}
+}
+
+func TestMD028NoFix(t *testing.T) {
+	rule := &MD028{Enabled: false}
+
+	input := "> Line 1\n\n> Line 2\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD028.Fix() should not change when disabled")
+	}
+}
+
+func TestMD033AllowedTags(t *testing.T) {
+	rule := &MD033{Enabled: true, AllowedTags: []string{"br", "img"}}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"allowed tag", "<br>\n", 0},
+		{"disallowed tag", "<div>text</div>\n", 1},
+		{"in code", "`<div>`\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD033.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD036EdgeCases(t *testing.T) {
+	rule := &MD036{Suggest: false}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"italic as heading", "*Italic Text*\n", 1},
+		{"underscore bold", "__Bold__\n", 1},
+		{"mixed content", "Some **bold** more\n", 0},
+		{"normal paragraph", "Just normal text\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD036.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD041SkipFiles(t *testing.T) {
+	rule := &MD041{DeriveFromFilename: true, FrontMatter: true}
+
+	tests := []struct {
+		name     string
+		path     string
+		input    string
+		wantViol int
+	}{
+		{"sidebar file", "test/_sidebar.md", "Content\n", 0},
+		{"index file", "test/index.md", "Content\n", 0},
+		{"changelog", "test/CHANGELOG.md", "Content\n", 0},
+		{"nav file", "test/nav.md", "Content\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, tt.path)
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD041.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD041FrontMatterTitle(t *testing.T) {
+	rule := &MD041{DeriveFromFilename: true, FrontMatter: true}
+
+	input := "---\ntitle: My Title\n---\nContent\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD041.Lint() should skip files with title in front matter")
+	}
+}
+
+func TestMD041PromoteFirst(t *testing.T) {
+	rule := &MD041{DeriveFromFilename: false, PromoteFirst: true, FrontMatter: false}
+
+	input := "## Section\nContent\n"
+	result := rule.Fix(input, "test.md")
+	if !result.Changed {
+		t.Error("MD041.Fix() should promote first H2 to H1")
+	}
+}
+
+func TestMD041NoFix(t *testing.T) {
+	rule := &MD041{DeriveFromFilename: false, PromoteFirst: false, FrontMatter: false}
+
+	input := "Content\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD041.Fix() should not change when both options are false")
+	}
+}
+
+func TestMD042InCode(t *testing.T) {
+	rule := &MD042{}
+
+	input := "```\n[empty]()\n```\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD042.Lint() should not detect links in code blocks")
+	}
+}
+
+func TestMD043WithHeadingsPass(t *testing.T) {
+	rule := &MD043{Headings: []string{"# Title", "## Usage"}}
+
+	input := "# Title\n## Usage\nContent\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD043.Lint() should return no violations when all headings present")
+	}
+}
+
+func TestMD045InCode(t *testing.T) {
+	rule := &MD045{Suggest: true}
+
+	input := "```\n![](image.png)\n```\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD045.Lint() should not detect images in code blocks")
+	}
+}
+
+func TestMD051Aggressive(t *testing.T) {
+	rule := &MD051{SuggestClosest: true, Aggressive: false}
+
+	input := "# Installation\n[link](#instalation)\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD051.Fix() should not fix without Aggressive")
+	}
+}
+
+func TestMD051NoFix(t *testing.T) {
+	rule := &MD051{SuggestClosest: true, Aggressive: true}
+
+	input := "# Heading\n[link](#heading)\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD051.Fix() should not change valid links")
+	}
+}
+
+func TestMD052InCode(t *testing.T) {
+	rule := &MD052{}
+
+	input := "```\n[text][ref]\n```\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD052.Lint() should not detect refs in code blocks")
+	}
+}
+
+func TestMD052WithDefinition(t *testing.T) {
+	rule := &MD052{}
+
+	input := "[text][ref]\n[ref]: https://example.com\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD052.Lint() should not report defined references")
+	}
+}
+
+func TestMD056NoFix(t *testing.T) {
+	rule := &MD056{PadShortRows: false}
+
+	input := "| A | B |\n|---|---|\n| 1 |\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD056.Fix() should not fix when PadShortRows is false")
+	}
+}
+
+func TestMD056EdgeCases(t *testing.T) {
+	rule := &MD056{PadShortRows: true}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"empty table", "", 0},
+		{"single column", "| A |\n|---|\n| 1 |\n", 0},
+		{"no trailing pipe", "A | B\n---|---\n1 | 2\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD056.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD057ExternalLink(t *testing.T) {
+	rule := &MD057{SuggestClosest: true}
+
+	input := "[link](https://example.com)\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD057.Lint() should not report external links")
+	}
+}
+
+func TestMD057FragmentLink(t *testing.T) {
+	rule := &MD057{SuggestClosest: true}
+
+	input := "[link](#section)\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD057.Lint() should not report fragment-only links")
+	}
+}
+
+func TestMD057InCode(t *testing.T) {
+	rule := &MD057{SuggestClosest: true}
+
+	input := "```\n[link](./missing.md)\n```\n"
+	violations := rule.Lint(input, "test.md")
+	if len(violations) != 0 {
+		t.Error("MD057.Lint() should not detect links in code blocks")
+	}
+}
+
+func TestMD007OrderedLists(t *testing.T) {
+	rule := &MD007{Indent: 2}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"ordered list", "1. item\n   1. nested\n", 0},
+		{"unordered with ordered", "- item\n  1. nested\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD007.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD004StyleOptions(t *testing.T) {
+	tests := []struct {
+		style   string
+		input   string
+		wantFix string
+	}{
+		{"asterisk", "- item\n", "* item\n"},
+		{"plus", "- item\n", "+ item\n"},
+		{"dash", "* item\n", "- item\n"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.style, func(t *testing.T) {
+			rule := &MD004{Style: tt.style}
+			result := rule.Fix(tt.input, "test.md")
+			if result.Content() != tt.wantFix {
+				t.Errorf("MD004.Fix() style %s = %q, want %q", tt.style, result.Content(), tt.wantFix)
+			}
+		})
+	}
+}
+
+func TestMD004ListIndent(t *testing.T) {
+	rule := &MD004{Style: "dash"}
+
+	input := "  * indented\n"
+	result := rule.Fix(input, "test.md")
+	if !strings.HasPrefix(result.Content(), "  -") {
+		t.Error("MD004.Fix() should preserve indentation")
+	}
+}
+
+func TestMD005ListBlocks(t *testing.T) {
+	rule := &MD005{}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"multiple lists", "- item\n\n- another\n", 0},
+		{"nested lists", "- item\n  - nested\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD005.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD013Fix(t *testing.T) {
+	rule := &MD013{LineLength: 80, Enabled: true}
+
+	input := "short line\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD013.Fix() should never change content")
+	}
+}
+
+func TestMD024Fix(t *testing.T) {
+	rule := &MD024{}
+
+	input := "# Heading\n# Heading\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD024.Fix() should never change content")
+	}
+}
+
+func TestMD025Fix(t *testing.T) {
+	rule := &MD025{}
+
+	input := "# Title 1\n# Title 2\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD025.Fix() should never change content")
+	}
+}
+
+func TestMD036Fix(t *testing.T) {
+	rule := &MD036{}
+
+	input := "**Bold Text**\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD036.Fix() should never change content")
+	}
+}
+
+func TestMD042Fix(t *testing.T) {
+	rule := &MD042{}
+
+	input := "[empty]()\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD042.Fix() should never change content")
+	}
+}
+
+func TestMD043Fix(t *testing.T) {
+	rule := &MD043{Headings: []string{"# Title"}}
+
+	input := "Content\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD043.Fix() should never change content")
+	}
+}
+
+func TestMD045Fix(t *testing.T) {
+	rule := &MD045{}
+
+	input := "![](image.png)\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD045.Fix() should never change content")
+	}
+}
+
+func TestMD052Fix(t *testing.T) {
+	rule := &MD052{}
+
+	input := "[text][ref]\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD052.Fix() should never change content")
+	}
+}
+
+func TestMD057Fix(t *testing.T) {
+	rule := &MD057{}
+
+	input := "[link](./missing.md)\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD057.Fix() should never change content")
+	}
+}
+
+func TestMD014MixedBlock(t *testing.T) {
+	rule := &MD014{Enabled: true, Smart: true}
+
+	input := "```\n$ command\noutput\n$ another\n```\n"
+	result := rule.Fix(input, "test.md")
+	_ = result
+}
+
+func TestMD051SlugGeneration(t *testing.T) {
+	rule := &MD051{SuggestClosest: true, Aggressive: false}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{"special chars in heading", "# Hello World!@#\n[link](#hello-world)\n", 0},
+		{"spaces in heading", "# My Section\n[link](#my-section)\n", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD051.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD056MultipleTables(t *testing.T) {
+	rule := &MD056{PadShortRows: true}
+
+	input := "| A |\n|---|\n| 1 |\n\n| B | C |\n|---|---|\n| 2 |\n"
+	result := rule.Fix(input, "test.md")
+	if !result.Changed {
+		t.Error("MD056.Fix() should fix second table")
 	}
 }

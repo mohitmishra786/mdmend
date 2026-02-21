@@ -6,12 +6,12 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/mohitmishra786/mdmend/internal/config"
 	"github.com/mohitmishra786/mdmend/internal/fixer"
 	"github.com/mohitmishra786/mdmend/internal/linter"
 	"github.com/mohitmishra786/mdmend/internal/reporter"
 	"github.com/mohitmishra786/mdmend/internal/walker"
+	"github.com/spf13/cobra"
 )
 
 var (
