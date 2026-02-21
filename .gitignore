@@ -6,6 +6,9 @@
 *.so
 *.dylib
 
+# Platform binaries in npm packages (fetched from releases)
+npm/platforms/*/bin/*
+
 # Build artifacts
 dist/
 build/

@@ -1,0 +1,19 @@
+{
+  "name": "@mohitmishra7/mdmend-win32-x64",
+  "version": "1.0.0",
+  "description": "mdmend binary for win32/x64",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohitmishra786/mdmend.git"
+  },
+  "files": [
+    "bin/mdmend.exe",
+    "README.md"
+  ],
+  "os": ["win32"],
+  "cpu": ["x64"],
+  "engines": {
+    "node": ">=14"
+  }
+}

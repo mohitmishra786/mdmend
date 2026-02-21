@@ -1,0 +1,4 @@
+# nothing extra — package.json "files" field controls what ships
+*.test.js
+*.spec.js
+.DS_Store

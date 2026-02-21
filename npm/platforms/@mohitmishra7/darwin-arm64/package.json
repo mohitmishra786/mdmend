@@ -1,0 +1,19 @@
+{
+  "name": "@mohitmishra7/mdmend-darwin-arm64",
+  "version": "1.0.0",
+  "description": "mdmend binary for darwin/arm64",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohitmishra786/mdmend.git"
+  },
+  "files": [
+    "bin/mdmend",
+    "README.md"
+  ],
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "engines": {
+    "node": ">=14"
+  }
+}

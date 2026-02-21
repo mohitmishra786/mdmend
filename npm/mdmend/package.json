@@ -1,0 +1,43 @@
+{
+  "name": "@mohitmishra7/mdmend",
+  "version": "1.0.0",
+  "description": "Fast, zero-dependency Markdown linter and fixer. Automatically fixes 48 common Markdown issues.",
+  "keywords": [
+    "markdown",
+    "linter",
+    "fixer",
+    "mdmend",
+    "markdownlint",
+    "cli",
+    "format",
+    "lint"
+  ],
+  "author": "Mohit Mishra <mohitmishra786@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohitmishra786/mdmend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mohitmishra786/mdmend/issues"
+  },
+  "homepage": "https://github.com/mohitmishra786/mdmend#readme",
+  "bin": {
+    "mdmend": "bin/mdmend"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "optionalDependencies": {
+    "@mohitmishra7/mdmend-linux-x64": "1.0.0",
+    "@mohitmishra7/mdmend-linux-arm64": "1.0.0",
+    "@mohitmishra7/mdmend-darwin-x64": "1.0.0",
+    "@mohitmishra7/mdmend-darwin-arm64": "1.0.0",
+    "@mohitmishra7/mdmend-win32-x64": "1.0.0"
+  }
+}

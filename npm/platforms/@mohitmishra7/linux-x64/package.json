@@ -1,0 +1,19 @@
+{
+  "name": "@mohitmishra7/mdmend-linux-x64",
+  "version": "1.0.0",
+  "description": "mdmend binary for linux/x64",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohitmishra786/mdmend.git"
+  },
+  "files": [
+    "bin/mdmend",
+    "README.md"
+  ],
+  "os": ["linux"],
+  "cpu": ["x64"],
+  "engines": {
+    "node": ">=14"
+  }
+}
