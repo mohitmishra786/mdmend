@@ -1,0 +1,64 @@
+name: Publish npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 1.0.2 or v1.0.2)"
+        required: true
+        type: string
+      dry_run:
+        description: "Dry run only (npm publish --dry-run, no upload)"
+        required: false
+        type: boolean
+        default: false
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish-${{ github.event.release.tag_name || inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            version="${{ github.event.release.tag_name }}"
+          else
+            version="${{ inputs.version }}"
+          fi
+          version="${version#v}"
+          echo "value=${version}" >> "$GITHUB_OUTPUT"
+          echo "Target version: v${version}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+
+      - name: Install unzip
+        run: sudo apt-get update && sudo apt-get install -y unzip
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true && '1' || '0' }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          if [[ -z "${NODE_AUTH_TOKEN}" ]]; then
+            echo "::error::Repository secret NPM_TOKEN is not set."
+            echo "Create an npm automation token at https://www.npmjs.com/settings/tokens"
+            echo "Then add it under Settings → Secrets and variables → Actions → NPM_TOKEN"
+            exit 1
+          fi
+          bash scripts/publish-npm.sh "${{ steps.version.outputs.value }}"
