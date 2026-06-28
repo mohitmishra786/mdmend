@@ -16,7 +16,7 @@ type fenceInfo struct {
 
 func splitLinesKeep(content string) []string {
 	if content == "" {
-		return nil
+		return []string{}
 	}
 	lines := strings.Split(content, "\n")
 	if strings.HasSuffix(content, "\n") {

@@ -7,6 +7,15 @@ import (
 	"github.com/mohitmishra786/mdmend/internal/config"
 )
 
+func TestMD046Fix(t *testing.T) {
+	rule := &MD046{Style: "consistent"}
+	input := "```go\nx\n```\n\n    indented\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD046.Fix() should not change content")
+	}
+}
+
 func TestMD046(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -57,6 +66,15 @@ func TestMD046(t *testing.T) {
 	}
 }
 
+func TestMD054Fix(t *testing.T) {
+	rule := &MD054{Inline: true, Autolink: true}
+	input := "[inline](https://example.com)\n<https://example.org>\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD054.Fix() should not change content")
+	}
+}
+
 func TestMD054(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -98,6 +116,15 @@ func TestMD054(t *testing.T) {
 	}
 }
 
+func TestMD066Fix(t *testing.T) {
+	rule := &MD066{}
+	input := "Text[^note] here.\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD066.Fix() should not change content")
+	}
+}
+
 func TestMD066(t *testing.T) {
 	rule := &MD066{}
 
@@ -123,6 +150,15 @@ func TestMD066(t *testing.T) {
 	})
 }
 
+func TestMD067Fix(t *testing.T) {
+	rule := &MD067{}
+	input := "[^a][^b]\n\n[^b]: second\n[^a]: first\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD067.Fix() should not change content")
+	}
+}
+
 func TestMD067(t *testing.T) {
 	rule := &MD067{}
 
@@ -139,6 +175,15 @@ func TestMD067(t *testing.T) {
 			t.Fatalf("got %d violations, want 1", got)
 		}
 	})
+}
+
+func TestMD068Fix(t *testing.T) {
+	rule := &MD068{}
+	input := "[^note]:\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD068.Fix() should not change content")
+	}
 }
 
 func TestMD068(t *testing.T) {
@@ -214,6 +259,18 @@ func TestMD073(t *testing.T) {
 		input := "# Title\n<!-- toc -->\n- [Missing](#missing)\n<!-- /toc -->\n\n## Present\n"
 		if got := len(rule.Lint(input, "test.md")); got != 2 {
 			t.Fatalf("got %d violations, want 2", got)
+		}
+	})
+
+	t.Run("disabled", func(t *testing.T) {
+		disabled := &MD073{Enabled: false}
+		input := "# Title\n<!-- toc -->\n- [Wrong](#wrong)\n<!-- /toc -->\n\n## Section One\n"
+		if got := len(disabled.Lint(input, "test.md")); got != 0 {
+			t.Fatalf("got %d violations, want 0 when disabled", got)
+		}
+		result := disabled.Fix(input, "test.md")
+		if result.Changed {
+			t.Error("MD073.Fix() should not change content when disabled")
 		}
 	})
 

@@ -111,6 +111,7 @@ func RulesByPhase(phase Phase) []Rule {
 		"MD037": PhaseInline,
 		"MD038": PhaseInline,
 		"MD039": PhaseInline,
+		"MD044": PhaseInline,
 		"MD042": PhaseInline,
 		"MD043": PhaseInline,
 		"MD051": PhaseInline,
