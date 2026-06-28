@@ -74,7 +74,7 @@ Results are:
 
 - **Artifacts** — per-runner JSON (90-day retention)
 - **History** — committed to `docs/benchmarks/history/<date>/` on the default branch
-- **Charts** — published to GitHub Pages (`gh-pages` branch) at `https://mohitmishra786.github.io/mdmend/dev/bench/` after you enable Pages → **Deploy from branch** → `gh-pages` / `/ (root)`
+- **Charts** — published to GitHub Pages (`gh-pages` branch) at `https://mohitmishra786.github.io/mdmend/dev/bench/` (filter by platform and corpus). Enable Pages → **Deploy from branch** → `gh-pages` / `/ (root)`
 
 Enable Pages once the first benchmark workflow creates the `gh-pages` branch.
 

@@ -155,7 +155,7 @@ jobs:
           fail-on-alert: false
           skip-fetch-gh-pages: false
 
-      - name: Ensure gh-pages root index
+      - name: Deploy gh-pages dashboard
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -164,13 +164,14 @@ jobs:
           worktree="$(mktemp -d)"
           git clone --depth 1 --branch gh-pages "$remote" "$worktree"
           cp scripts/gh-pages-index.html "$worktree/index.html"
+          cp scripts/gh-pages-bench/index.html "$worktree/dev/bench/index.html"
           cd "$worktree"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html
+          git add index.html dev/bench/index.html
           if git diff --staged --quiet; then
-            echo "Root index.html already up to date"
+            echo "gh-pages dashboard already up to date"
           else
-            git commit -m "pages: add root redirect to dev/bench"
+            git commit -m "pages: deploy benchmark dashboard UI"
             git push origin gh-pages
           fi
