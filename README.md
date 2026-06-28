@@ -14,7 +14,7 @@ Fast, zero-dependency Markdown linter and fixer. 57 rules. 40 auto-fixable.
 
 Single static binary. No Node or Python runtime required.
 
-**Performance:** lint **~7 ms** on a 200-file stress corpus — fastest among tested linters. See [Benchmarks](#benchmarks).
+**Performance:** lint **~7 ms** on a 200-file stress corpus — fastest among tested linters. See [Benchmarks](#benchmarks) or the [live CI dashboard](https://mohitmishra786.github.io/mdmend/dev/bench/).
 
 </div>
 
@@ -74,7 +74,7 @@ scoop install mdmend
 curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/apt/install.sh | bash
 
 # Or download .deb directly
-curl -sSL https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.1_linux_amd64.deb -o mdmend.deb
+curl -sSL https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.2_linux_amd64.deb -o mdmend.deb
 sudo dpkg -i mdmend.deb
 ```
 
@@ -85,7 +85,7 @@ sudo dpkg -i mdmend.deb
 curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/yum/install.sh | bash
 
 # Or download .rpm directly
-sudo dnf install https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.1_linux_amd64.rpm
+sudo dnf install https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.2_linux_amd64.rpm
 ```
 
 ### Arch Linux (AUR)
@@ -131,7 +131,7 @@ curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/scripts/
 
 ### Download Binary
 
-Download from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases) for your platform (latest: **v1.0.1**):
+Download from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases) for your platform (latest: **v1.0.2**):
 - `mdmend_*_linux_amd64.tar.gz` — Linux x64
 - `mdmend_*_linux_arm64.tar.gz` — Linux ARM64
 - `mdmend_*_darwin_amd64.tar.gz` — macOS Intel
@@ -360,16 +360,16 @@ See [pkg/mdmend](pkg/mdmend) for full API documentation.
 ### GitHub Actions (composite action)
 
 ```yaml
-- uses: mohitmishra786/mdmend@v1.0.1
+- uses: mohitmishra786/mdmend@v1.0.2
   with:
     args: check . --quiet
-    version: 1.0.1
+    version: 1.0.2
 ```
 
 Install via npm (default) or Go:
 
 ```yaml
-- uses: mohitmishra786/mdmend@v1.0.1
+- uses: mohitmishra786/mdmend@v1.0.2
   with:
     install-method: go
     args: check docs/ --flavor mkdocs
@@ -419,7 +419,9 @@ mdmend server
 
 ## Benchmarks
 
-mdmend is benchmarked against other Markdown linters using [hyperfine](https://github.com/sharkdp/hyperfine) across multiple corpora. Reproduce locally with `make benchmark` or read the full methodology in [docs/BENCHMARKS.md](docs/BENCHMARKS.md). CI runs the suite weekly and uploads artifacts.
+**[Live CI dashboard](https://mohitmishra786.github.io/mdmend/dev/bench/)** — filter by platform (Linux/macOS/Windows), corpus size (small/medium/stress), and tool. Updated weekly; historical JSON in `docs/benchmarks/history/`.
+
+mdmend is benchmarked against rumdl, markdownlint-cli2, and pymarkdown using [hyperfine](https://github.com/sharkdp/hyperfine). Reproduce locally with `make benchmark` or read [docs/BENCHMARKS.md](docs/BENCHMARKS.md) for methodology.
 
 ### Stress corpus (200 files, ~1.38 MB)
 
@@ -455,14 +457,12 @@ Measured on Apple Silicon macOS (June 2026). Competitors run their default lint 
 | High | Incremental lint via `--watch` + cache warming | Near-zero cost on single-file edits in large repos |
 | High | SIMD / batch line scanning for hot rules (MD009, MD010, MD013) | Lower per-byte cost on megabyte-scale files |
 | Medium | Rule-level short-circuit when a file has no matching constructs | Skip MD056 on files with no tables, etc. |
-| Medium | Publish multi-platform CI benchmark dashboard (Linux/macOS/Windows) | Reproducible cross-OS comparison tables in README |
+| Done | [Multi-platform CI benchmark dashboard](https://mohitmishra786.github.io/mdmend/dev/bench/) | Linux, macOS, and Windows — filter by corpus and tool |
 | Medium | Memory profiling on stress corpus; cap allocations in fix pipeline | Stable performance under 10k+ file monorepos |
 | Low | Optional `mdmend lint --profile` flag for per-rule timing | Helps contributors optimize the slowest rules |
 | Low | Compare fix throughput with rumdl `--fix` when parity rules align | Apples-to-apples auto-fix benchmarking |
 
-**Live CI charts:** after the weekly benchmark workflow runs, see [GitHub Pages benchmark dashboard](https://mohitmishra786.github.io/mdmend/dev/bench/) (enable Pages from the `gh-pages` branch on first run). Historical JSON is stored under `docs/benchmarks/history/`.
-
-Contributions welcome on any item above — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions welcome on any roadmap item above — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Tech Stack
 

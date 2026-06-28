@@ -1,7 +1,7 @@
 {
   "name": "@mohitmishra7/mdmend",
-  "version": "1.0.0",
-  "description": "Fast, zero-dependency Markdown linter and fixer. Automatically fixes 48 common Markdown issues.",
+  "version": "1.0.2",
+  "description": "Fast, zero-dependency Markdown linter and fixer. 57 rules, 40 auto-fixable.",
   "keywords": [
     "markdown",
     "linter",
@@ -34,10 +34,10 @@
     "node": ">=14"
   },
   "optionalDependencies": {
-    "@mohitmishra7/mdmend-linux-x64": "1.0.0",
-    "@mohitmishra7/mdmend-linux-arm64": "1.0.0",
-    "@mohitmishra7/mdmend-darwin-x64": "1.0.0",
-    "@mohitmishra7/mdmend-darwin-arm64": "1.0.0",
-    "@mohitmishra7/mdmend-win32-x64": "1.0.0"
+    "@mohitmishra7/mdmend-linux-x64": "1.0.2",
+    "@mohitmishra7/mdmend-linux-arm64": "1.0.2",
+    "@mohitmishra7/mdmend-darwin-x64": "1.0.2",
+    "@mohitmishra7/mdmend-darwin-arm64": "1.0.2",
+    "@mohitmishra7/mdmend-win32-x64": "1.0.2"
   }
 }

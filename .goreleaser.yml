@@ -129,8 +129,8 @@ snapcrafts:
     summary: "Fast Markdown linter and fixer"
     description: |
       mdmend is a fast, zero-dependency Markdown linter and fixer that
-      automatically fixes common Markdown linting issues. Supports 48 rules
-      with 38 auto-fixable violations.
+      automatically fixes common Markdown linting issues. Supports 57 rules
+      with 40 auto-fixable violations.
     grade: stable
     confinement: classic
     license: MIT

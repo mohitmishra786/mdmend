@@ -11,7 +11,7 @@ inputs:
   version:
     description: mdmend npm package version to install
     required: false
-    default: 1.0.0
+    default: 1.0.2
   install-method:
     description: Install method (npm or go)
     required: false
