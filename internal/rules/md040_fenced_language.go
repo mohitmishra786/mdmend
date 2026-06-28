@@ -57,6 +57,9 @@ func (r *MD040) Fix(content string, path string) FixResult {
 	inCodeBlock := false
 	var codeBlockContent []string
 	codeBlockStart := -1
+	openIndent := ""
+	openFenceChar := byte('`')
+	openFenceLen := 3
 
 	for i, line := range lines {
 		trimmed := strings.TrimSpace(line)
@@ -67,25 +70,25 @@ func (r *MD040) Fix(content string, path string) FixResult {
 					codeBlockStart = i
 					codeBlockContent = []string{}
 					inCodeBlock = true
+					openIndent = line[:len(line)-len(strings.TrimLeft(line, " \t"))]
+					openFenceChar = trimmed[0]
+					openFenceLen = 0
+					for openFenceLen < len(trimmed) && trimmed[openFenceLen] == openFenceChar {
+						openFenceLen++
+					}
 				}
 			} else {
-				if codeBlockStart >= 0 && len(codeBlockContent) > 0 {
+				if codeBlockStart >= 0 {
 					prevLines := lines[max(0, codeBlockStart-5):codeBlockStart]
 					inferred := inferrer.InferLanguage(codeBlockContent, prevLines)
-					confidence := inferred.Confidence
-					if confidence < r.Confidence && !r.Aggressive {
+					if inferred.Confidence < r.Confidence && !r.Aggressive {
 						inferred.Language = r.Fallback
 					}
 					if inferred.Language == "" {
 						inferred.Language = r.Fallback
 					}
-					fenceChar := string(trimmed[0])
-					fenceLen := 3
-					for j := 1; j < len(trimmed) && j < 10 && trimmed[j] == trimmed[0]; j++ {
-						fenceLen++
-					}
-					fence := strings.Repeat(fenceChar, fenceLen)
-					lines[codeBlockStart] = fence + " " + inferred.Language
+					fence := strings.Repeat(string(openFenceChar), openFenceLen)
+					lines[codeBlockStart] = openIndent + fence + " " + inferred.Language
 					changed = true
 				}
 				inCodeBlock = false
