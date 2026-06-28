@@ -4,7 +4,7 @@
 
 *Mend your Markdown. Instantly.*
 
-Fast, zero-dependency Markdown linter and fixer. 48 rules. 38 auto-fixable.
+Fast, zero-dependency Markdown linter and fixer. 50 rules. 38 auto-fixable.
 
 [![GitHub Release](https://img.shields.io/github/v/release/mohitmishra786/mdmend?style=flat-square&color=blue)](https://github.com/mohitmishra786/mdmend/releases)
 [![NPM Version](https://img.shields.io/npm/v/@mohitmishra7/mdmend?style=flat-square&color=007acc)](https://www.npmjs.com/package/@mohitmishra7/mdmend)
@@ -23,7 +23,7 @@ Fast, zero-dependency Markdown linter and fixer. 48 rules. 38 auto-fixable.
 | **npm** | [![npm](https://img.shields.io/npm/v/@mohitmishra7/mdmend.svg?label=)](https://www.npmjs.com/package/@mohitmishra7/mdmend) | Cross-platform npm package | `npm install -g @mohitmishra7/mdmend` |
 | **Homebrew** | [![homebrew](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=&color=orange)](https://github.com/mohitmishra786/homebrew-tap) | macOS/Linux via Homebrew | `brew install mohitmishra786/tap/mdmend` |
 | **Go** | [![go](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://pkg.go.dev/github.com/mohitmishra786/mdmend) | Go library and CLI | `go install github.com/mohitmishra786/mdmend/cmd/mdmend@latest` |
-| **Scoop** | ![scoop](https://img.shields.io/badge/scoop-mdmend-blue) | Windows via Scoop | `scoop install mohitmishra786/mdmend` |
+| **Scoop** | ![scoop](https://img.shields.io/badge/scoop-mdmend-blue) | Windows via Scoop | `scoop bucket add mohitmishra786 https://github.com/mohitmishra786/scoop-bucket && scoop install mdmend` |
 | **DEB** | [![deb](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://github.com/mohitmishra786/mdmend/releases) | Debian/Ubuntu | `curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/apt/install.sh \| bash` |
 | **RPM** | [![rpm](https://img.shields.io/github/v/release/mohitmishra786/mdmend?label=)](https://github.com/mohitmishra786/mdmend/releases) | Fedora/RHEL/CentOS | `curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/yum/install.sh \| bash` |
 | **AUR** | ![aur](https://img.shields.io/badge/aur-mdmend--bin-blue) | Arch Linux | `yay -S mdmend-bin` |
@@ -70,7 +70,7 @@ scoop install mdmend
 curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/apt/install.sh | bash
 
 # Or download .deb directly
-curl -sSL https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.0_linux_amd64.deb -o mdmend.deb
+curl -sSL https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.1_linux_amd64.deb -o mdmend.deb
 sudo dpkg -i mdmend.deb
 ```
 
@@ -81,7 +81,7 @@ sudo dpkg -i mdmend.deb
 curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/packaging/yum/install.sh | bash
 
 # Or download .rpm directly
-sudo dnf install https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.0_linux_amd64.rpm
+sudo dnf install https://github.com/mohitmishra786/mdmend/releases/latest/download/mdmend_1.0.1_linux_amd64.rpm
 ```
 
 ### Arch Linux (AUR)
@@ -127,16 +127,25 @@ curl -fsSL https://raw.githubusercontent.com/mohitmishra786/mdmend/main/scripts/
 
 ### Download Binary
 
-Download from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases) for your platform:
-- `mdmend_1.0.0_linux_amd64.tar.gz` — Linux x64
-- `mdmend_1.0.0_linux_arm64.tar.gz` — Linux ARM64
-- `mdmend_1.0.0_darwin_amd64.tar.gz` — macOS Intel
-- `mdmend_1.0.0_darwin_arm64.tar.gz` — macOS Apple Silicon
-- `mdmend_1.0.0_windows_amd64.zip` — Windows x64
+Download from [GitHub Releases](https://github.com/mohitmishra786/mdmend/releases) for your platform (latest: **v1.0.1**):
+- `mdmend_*_linux_amd64.tar.gz` — Linux x64
+- `mdmend_*_linux_arm64.tar.gz` — Linux ARM64
+- `mdmend_*_darwin_amd64.tar.gz` — macOS Intel
+- `mdmend_*_darwin_arm64.tar.gz` — macOS Apple Silicon
+- `mdmend_*_windows_amd64.zip` — Windows x64
+- `.deb`, `.rpm`, and `.apk` packages also available per release
 
 ## Quick Start
 
 ```bash
+# Scaffold config (optionally import from .markdownlint.json)
+mdmend init
+mdmend init --from-markdownlint
+
+# Lint or fix (check is a CI-friendly alias)
+mdmend check .
+mdmend check . --fix
+
 # Fix all Markdown files in current directory
 mdmend fix .
 
@@ -148,6 +157,12 @@ mdmend fix . --diff
 
 # Lint only (exit 1 if violations found)
 mdmend lint .
+
+# Lint MDX or MkDocs projects
+mdmend lint docs/ --flavor mdx
+
+# Watch and re-lint on save
+mdmend lint docs/ --watch
 
 # Get suggestions for heuristic fixes
 mdmend suggest docs/
@@ -163,9 +178,13 @@ mdmend rules info MD040
 
 | Command | Description |
 |---------|-------------|
+| `mdmend check [paths...]` | Lint or fix (`--fix`) — alias for CI and GitHub Actions |
 | `mdmend lint [paths...]` | Report violations without fixing |
 | `mdmend fix [paths...]` | Auto-fix all fixable violations |
 | `mdmend suggest [paths...]` | Show suggested fixes for heuristic rules |
+| `mdmend init` | Create `.mdmend.yml` (`--from-markdownlint` imports markdownlint config) |
+| `mdmend server` | Start stdio JSON-RPC language server for editor integration |
+| `mdmend cache clear` | Clear the lint result cache |
 | `mdmend rules list` | List all available rules |
 | `mdmend rules info <id>` | Show details about a specific rule |
 | `mdmend version` | Print version information |
@@ -177,24 +196,27 @@ mdmend rules info MD040
 | `--verbose` / `-v` | Per-file timing and file list |
 | `--quiet` / `-q` | Summary line only |
 | `--stats` | Per-rule violation frequency table |
-| `--only MD040,MD034` | Run only specific rules |
+| `--only MD040,MD034` | Run only specific rules (lint and fix) |
+| `--flavor standard\|mdx\|mkdocs` | Markdown flavor for rule behavior |
 | `--exit-zero` | Always exit 0 (advisory CI mode) |
 | `--max-violations N` | Fail only if violations exceed N |
-| `--output json` | JSON output format |
+| `--output console\|json\|sarif` | Output format (SARIF for security dashboards) |
+| `--no-cache` | Disable per-file hash cache |
 | `--no-color` | Disable color output |
 
-### Fix Command Flags
+### Lint / Fix Flags
 
 | Flag | Description |
 |------|-------------|
-| `--dry-run` / `-n` | Preview changes without writing |
-| `--diff` / `-d` | Output unified diffs |
+| `--watch` | Re-run when files change (lint/fix) |
+| `--dry-run` / `-n` | Preview changes without writing (fix) |
+| `--diff` / `-d` | Output unified diffs (fix) |
 | `--aggressive` | Apply heuristic fixes (MD040/MD034) |
 | `--config` / `-c` | Path to config file |
 
 ## Supported Rules
 
-48 rules total. 38 auto-fixable.
+50 rules total. 38 auto-fixable.
 
 ### Auto-Fixable
 
@@ -244,9 +266,11 @@ mdmend rules info MD040
 
 | Rule | Description |
 |------|-------------|
+| MD001 | Heading level increments |
 | MD013 | Line length |
 | MD024 | Duplicate headings |
 | MD025 | Multiple top-level headings |
+| MD029 | Ordered list item prefix style |
 | MD033 | Inline HTML |
 | MD036 | Emphasis as heading |
 | MD041 | First line heading |
@@ -259,9 +283,14 @@ See [RULES.md](RULES.md) for complete documentation.
 
 ## Configuration
 
-Create `.mdmend.yml` in your project root:
+Create `.mdmend.yml` in your project root (or run `mdmend init`):
 
 ```yaml
+flavor: standard
+per_file_flavor:
+  "**/*.mdx": mdx
+  "docs/**": mkdocs
+
 disable:
   - MD013
   - MD033
@@ -277,6 +306,18 @@ ignore:
   - node_modules/
   - "*.generated.md"
 ```
+
+Migrating from markdownlint? Run `mdmend init --from-markdownlint` to import `.markdownlint.json` / `.markdownlint.yaml`. See [docs/MIGRATION.md](docs/MIGRATION.md).
+
+### Markdown Flavors
+
+| Flavor | Use case |
+|--------|----------|
+| `standard` | CommonMark-style Markdown (default) |
+| `mdx` | MDX / JSX-in-Markdown projects |
+| `mkdocs` | MkDocs documentation sites |
+
+Set globally with `--flavor` or per-path with `per_file_flavor` in config.
 
 ## Library Usage (Go)
 
@@ -305,11 +346,35 @@ See [pkg/mdmend](pkg/mdmend) for full API documentation.
 
 ## CI/CD Integration
 
-### GitHub Actions
+### GitHub Actions (composite action)
+
+```yaml
+- uses: mohitmishra786/mdmend@v1.0.1
+  with:
+    args: check . --quiet
+    version: 1.0.1
+```
+
+Install via npm (default) or Go:
+
+```yaml
+- uses: mohitmishra786/mdmend@v1.0.1
+  with:
+    install-method: go
+    args: check docs/ --flavor mkdocs
+```
+
+### GitHub Actions (npm one-liner)
 
 ```yaml
 - name: Lint Markdown
-  run: npx @mohitmishra7/mdmend lint . --output json
+  run: npx @mohitmishra7/mdmend check . --output json
+```
+
+### SARIF output (CodeQL / security dashboards)
+
+```bash
+mdmend lint . --output sarif > mdmend.sarif
 ```
 
 ### Pre-commit Hook
@@ -329,13 +394,26 @@ mdmend lint . --max-violations 10
 mdmend lint . --exit-zero
 ```
 
+## Editor Integration
+
+### VS Code
+
+A minimal extension lives in [`editors/vscode/`](editors/vscode/). It runs `mdmend lint` on save and surfaces violations as diagnostics.
+
+```bash
+# Development: open editors/vscode/ in VS Code and press F5
+# Or use the LSP directly from any editor that supports stdio JSON-RPC:
+mdmend server
+```
+
 ## Tech Stack
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| **Language** | Go 1.22+ | Zero-dependency binaries, fast compilation |
+| **Language** | Go 1.25+ | Zero-dependency binaries, fast compilation |
 | **CLI** | Cobra | Command-line argument parsing |
 | **Glob** | doublestar | File pattern matching |
+| **Watch** | fsnotify | `--watch` file change detection |
 | **Colors** | fatih/color | Terminal output coloring |
 | **Diff** | go-diff | Unified diff generation |
 | **Config** | yaml.v3 | Configuration file parsing |
@@ -348,6 +426,10 @@ The tool is intentionally minimal. No framework, no runtime dependencies, just s
 - [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
 - [SECURITY.md](SECURITY.md) — Security policy
 - [RULES.md](RULES.md) — Complete rules documentation
+- [docs/MIGRATION.md](docs/MIGRATION.md) — Migrating from markdownlint
+- [docs/ENTERPRISE.md](docs/ENTERPRISE.md) — Org deployment patterns
+- [docs/RULE_AUDIT.md](docs/RULE_AUDIT.md) — Rule coverage audit
+- [editors/vscode/README.md](editors/vscode/README.md) — VS Code extension
 
 ## License
 
