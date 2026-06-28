@@ -75,8 +75,20 @@
 | MD054 | Link and image style | Inline vs reference — preference | ⚠️ Report-only |
 | MD056 | Table column count inconsistency | Requires author to add/remove data | ⚠️ Report-only |
 | MD057 | Broken relative links | Cannot auto-create target files | ⚠️ Report-only |
+| MD066 | Footnote reference validation | Requires author to add/remove footnotes | ⚠️ Report-only |
+| MD067 | Footnote definition order | Reordering may change author intent | ⚠️ Report-only |
+| MD068 | Empty footnote definitions | Author must provide content | ⚠️ Report-only |
 
 **These rules are intentionally NOT auto-fixable by design.**
+
+---
+
+## 🔧 Opt-In Auto-Fixable
+
+| Rule | Description | Fix Strategy | Status |
+|------|-------------|--------------|--------|
+| MD070 | Nested markdown code fence length | Extend outer fence markers to clear inner content | ✅ Done (opt-in) |
+| MD073 | Table of contents validation | Rebuild marker-based TOC from headings | ✅ Done (opt-in) |
 
 ---
 
@@ -86,5 +98,6 @@
 |----------|-------------|-------|----------|
 | ✅ Mechanically Auto-Fixable | 27 | 27 | 100% |
 | 🧠 Heuristic-Fixable | 2 | 2 | 100% |
-| ⚠️ Report-Only | 0 | 24 | N/A (by design) |
-| **Total Auto-Fixable** | **29** | **29** | **100%** |
+| ⚠️ Report-Only | 27 | 27 | 100% |
+| 🔧 Opt-In Auto-Fixable | 2 | 2 | 100% |
+| **Total Auto-Fixable** | **40** | **40** | **100%** |

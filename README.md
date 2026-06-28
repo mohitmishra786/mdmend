@@ -4,7 +4,7 @@
 
 *Mend your Markdown. Instantly.*
 
-Fast, zero-dependency Markdown linter and fixer. 50 rules. 38 auto-fixable.
+Fast, zero-dependency Markdown linter and fixer. 57 rules. 40 auto-fixable.
 
 [![GitHub Release](https://img.shields.io/github/v/release/mohitmishra786/mdmend?style=flat-square&color=blue)](https://github.com/mohitmishra786/mdmend/releases)
 [![NPM Version](https://img.shields.io/npm/v/@mohitmishra7/mdmend?style=flat-square&color=007acc)](https://www.npmjs.com/package/@mohitmishra7/mdmend)
@@ -14,7 +14,7 @@ Fast, zero-dependency Markdown linter and fixer. 50 rules. 38 auto-fixable.
 
 Single static binary. No Node or Python runtime required.
 
-**Performance** (this repo, 57 markdown files): lint ~7 ms, fix dry run ~28 ms. Corpus lint ~3 ms. Run `make benchmark` for local timings; CI runs weekly via `.github/workflows/benchmark.yml`.
+**Performance** (stress corpus: 200 files / 1.38 MB): lint **~7 ms** — 3.7× faster than [rumdl](https://github.com/rvben/rumdl), 215× faster than markdownlint-cli2, 1,600× faster than pymarkdown. See [docs/BENCHMARKS.md](docs/BENCHMARKS.md). Run `make benchmark` locally; CI runs weekly.
 
 </div>
 
@@ -220,7 +220,7 @@ mdmend rules info MD040
 
 ## Supported Rules
 
-50 rules total. 38 auto-fixable.
+57 rules total. 40 auto-fixable.
 
 ### Auto-Fixable
 
@@ -258,6 +258,8 @@ mdmend rules info MD040
 | MD055 | Table pipe style |
 | MD056 | Table column count |
 | MD058 | Table blank lines |
+| MD070 | Nested markdown fence length (opt-in) |
+| MD073 | Table of contents validation (opt-in) |
 
 ### Heuristic (Smart Inference)
 
@@ -276,6 +278,11 @@ mdmend rules info MD040
 | MD025 | Multiple top-level headings |
 | MD029 | Ordered list item prefix style |
 | MD033 | Inline HTML |
+| MD046 | Code block style consistency |
+| MD054 | Link and image style consistency |
+| MD066 | Footnote reference validation |
+| MD067 | Footnote definition order |
+| MD068 | Empty footnote definitions |
 | MD036 | Emphasis as heading |
 | MD041 | First line heading |
 | MD045 | Image alt text |

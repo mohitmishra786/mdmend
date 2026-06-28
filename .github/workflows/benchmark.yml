@@ -20,9 +20,27 @@ jobs:
         run: go build -o mdmend ./cmd/mdmend
 
       - name: Install hyperfine
-        run: cargo install hyperfine 2>/dev/null || sudo apt-get update && sudo apt-get install -y hyperfine
+        run: |
+          if ! command -v hyperfine >/dev/null 2>&1; then
+            cargo install hyperfine --locked 2>/dev/null || {
+              sudo apt-get update
+              sudo apt-get install -y hyperfine
+            }
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install competitors
+        run: |
+          pip install pymarkdownlnt
+          cargo install rumdl --locked 2>/dev/null || true
 
       - name: Run benchmark script
+        env:
+          BENCH_RUNS: "3"
+          BENCH_WARMUP: "1"
         run: bash scripts/benchmark.sh
 
       - uses: actions/upload-artifact@v7

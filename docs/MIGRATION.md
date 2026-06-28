@@ -199,8 +199,13 @@ mdmend supports **48 rules** using the same IDs as markdownlint. Behavior is ali
 | MD001 | heading-increment | — | No | Planned / report-only in roadmap |
 | MD002 | first-heading-h1 | — | — | Deprecated in markdownlint |
 | MD029 | ol-prefix | — | No | Ordered list prefix style |
-| MD046 | code-block-style | — | No | Fenced vs indented preference |
-| MD054 | link-image-style | — | No | Inline vs reference preference |
+| MD046 | code-block-style | ✅ | No | Fenced vs indented preference (`style: consistent\|fenced\|indented`) |
+| MD054 | link-image-style | ✅ | No | Inline vs reference preference |
+| MD066 | footnote-validation | ✅ | No | Footnote refs must have definitions |
+| MD067 | footnote-definition-order | ✅ | No | Definition order should match ref order |
+| MD068 | empty-footnote-definition | ✅ | No | Footnote definitions must have body |
+| MD070 | nested-code-fence | ✅ | Yes (opt-in) | Extend fences in markdown code blocks (`enabled: false` default) |
+| MD073 | toc-validation | ✅ | Yes (opt-in) | Validate/rebuild `<!-- toc -->` blocks (`enabled: false` default) |
 
 Rules marked **—** are not yet implemented in mdmend. Disable them in markdownlint configs you migrate, or track them in a follow-up lint pass.
 
