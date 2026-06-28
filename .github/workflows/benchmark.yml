@@ -22,7 +22,7 @@ permissions:
 
 concurrency:
   group: benchmark-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   benchmark:
@@ -101,10 +101,11 @@ jobs:
           ls -la docs/benchmarks/history || true
 
       - name: Commit benchmark history
+        continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/benchmarks/history docs/benchmarks/latest.json
+          git add docs/benchmarks/history/
           if git diff --staged --quiet; then
             echo "No benchmark history changes to commit"
           else
