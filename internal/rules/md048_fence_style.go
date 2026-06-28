@@ -3,6 +3,8 @@ package rules
 import (
 	"regexp"
 	"strings"
+
+	"github.com/mohitmishra786/mdmend/internal/markdown"
 )
 
 type MD048 struct {
@@ -98,65 +100,86 @@ func (r *MD049) Name() string        { return "emphasis-style" }
 func (r *MD049) Description() string { return "Emphasis style should be consistent" }
 func (r *MD049) Fixable() bool       { return true }
 
+var md049UnderscoreEmphasis = regexp.MustCompile(`_([^_\n]+?)_`)
+var md049AsteriskEmphasis = regexp.MustCompile(`\*([^*\n]+?)\*`)
+
 func (r *MD049) Lint(content string, path string) []Violation {
 	var violations []Violation
 	lines := strings.Split(content, "\n")
-	style := r.Style
-	if style == "" {
-		style = "*"
-	}
+	style := r.style()
+	fenced := markdown.LinesInFencedBlocks(content)
 
 	for i, line := range lines {
-		if style == "*" && strings.Contains(line, "_") {
-			if matches := regexp.MustCompile(`_([^_]+)_`).FindAllStringIndex(line, -1); len(matches) > 0 {
-				for _, match := range matches {
-					content := line[match[0]:match[1]]
-					if isEmphasis(content) {
-						violations = append(violations, Violation{
-							Rule:      r.ID(),
-							Line:      i + 1,
-							Column:    match[0] + 1,
-							Message:   "Emphasis style should be asterisk (*)",
-							Fixable:   true,
-							Suggested: "*" + content[1:len(content)-1] + "*",
-						})
-					}
-				}
+		if fenced[i] {
+			continue
+		}
+		masked := markdown.MaskInlineCode(line)
+		var re *regexp.Regexp
+		var msg string
+		if style == "*" {
+			re = md049UnderscoreEmphasis
+			msg = "Emphasis style should be asterisk (*)"
+		} else {
+			re = md049AsteriskEmphasis
+			msg = "Emphasis style should be underscore (_)"
+		}
+		for _, match := range re.FindAllStringIndex(masked, -1) {
+			segment := line[match[0]:match[1]]
+			if !isEmphasis(segment) {
+				continue
 			}
-		} else if style == "_" && strings.Contains(line, "*") {
-			if matches := regexp.MustCompile(`\*([^*]+)\*`).FindAllStringIndex(line, -1); len(matches) > 0 {
-				for _, match := range matches {
-					content := line[match[0]:match[1]]
-					if isEmphasis(content) {
-						violations = append(violations, Violation{
-							Rule:      r.ID(),
-							Line:      i + 1,
-							Column:    match[0] + 1,
-							Message:   "Emphasis style should be underscore (_)",
-							Fixable:   true,
-							Suggested: "_" + content[1:len(content)-1] + "_",
-						})
-					}
-				}
-			}
+			violations = append(violations, Violation{
+				Rule:      r.ID(),
+				Line:      i + 1,
+				Column:    match[0] + 1,
+				Message:   msg,
+				Fixable:   true,
+				Suggested: emphasisToStyle(segment, style),
+			})
 		}
 	}
 	return violations
 }
 
 func (r *MD049) Fix(content string, path string) FixResult {
-	style := r.Style
-	if style == "" {
-		style = "*"
+	style := r.style()
+	lines := strings.Split(content, "\n")
+	fenced := markdown.LinesInFencedBlocks(content)
+	changed := false
+	for i, line := range lines {
+		if fenced[i] {
+			continue
+		}
+		var re *regexp.Regexp
+		if style == "*" {
+			re = md049UnderscoreEmphasis
+		} else {
+			re = md049AsteriskEmphasis
+		}
+		fixed := markdown.ReplaceOutsideInlineCode(line, re, func(m string) string {
+			return emphasisToStyle(m, style)
+		})
+		if fixed != line {
+			lines[i] = fixed
+			changed = true
+		}
 	}
+	return FixResult{Changed: changed, Lines: lines}
+}
 
-	var fixed string
-	if style == "*" {
-		fixed = regexp.MustCompile(`_([^_]+)_`).ReplaceAllString(content, "*$1*")
-	} else {
-		fixed = regexp.MustCompile(`\*([^*]+)\*`).ReplaceAllString(content, "_$1_")
+func (r *MD049) style() string {
+	if r.Style == "" {
+		return "*"
 	}
-	return FixResult{Changed: fixed != content, Lines: strings.Split(fixed, "\n")}
+	return r.Style
+}
+
+func emphasisToStyle(segment, style string) string {
+	inner := segment[1 : len(segment)-1]
+	if style == "*" {
+		return "*" + inner + "*"
+	}
+	return "_" + inner + "_"
 }
 
 func isEmphasis(s string) bool {
@@ -179,59 +202,82 @@ func (r *MD050) Name() string        { return "strong-style" }
 func (r *MD050) Description() string { return "Strong style should be consistent" }
 func (r *MD050) Fixable() bool       { return true }
 
+var md050UnderscoreStrong = regexp.MustCompile(`__([^_\n]+?)__`)
+var md050AsteriskStrong = regexp.MustCompile(`\*\*([^*\n]+?)\*\*`)
+
 func (r *MD050) Lint(content string, path string) []Violation {
 	var violations []Violation
 	lines := strings.Split(content, "\n")
-	style := r.Style
-	if style == "" {
-		style = "**"
-	}
+	style := r.strongStyle()
+	fenced := markdown.LinesInFencedBlocks(content)
 
 	for i, line := range lines {
-		if style == "**" && strings.Contains(line, "__") {
-			if matches := regexp.MustCompile(`__([^_]+)__`).FindAllStringIndex(line, -1); len(matches) > 0 {
-				for _, match := range matches {
-					violations = append(violations, Violation{
-						Rule:      r.ID(),
-						Line:      i + 1,
-						Column:    match[0] + 1,
-						Message:   "Strong style should be asterisk (**)",
-						Fixable:   true,
-						Suggested: "**" + line[match[0]+2:match[1]-2] + "**",
-					})
-				}
-			}
-		} else if style == "__" && strings.Contains(line, "**") {
-			if matches := regexp.MustCompile(`\*\*([^*]+)\*\*`).FindAllStringIndex(line, -1); len(matches) > 0 {
-				for _, match := range matches {
-					violations = append(violations, Violation{
-						Rule:      r.ID(),
-						Line:      i + 1,
-						Column:    match[0] + 1,
-						Message:   "Strong style should be underscore (__)",
-						Fixable:   true,
-						Suggested: "__" + line[match[0]+2:match[1]-2] + "__",
-					})
-				}
-			}
+		if fenced[i] {
+			continue
+		}
+		masked := markdown.MaskInlineCode(line)
+		var re *regexp.Regexp
+		var msg string
+		if style == "**" {
+			re = md050UnderscoreStrong
+			msg = "Strong style should be asterisk (**)"
+		} else {
+			re = md050AsteriskStrong
+			msg = "Strong style should be underscore (__)"
+		}
+		for _, match := range re.FindAllStringIndex(masked, -1) {
+			violations = append(violations, Violation{
+				Rule:      r.ID(),
+				Line:      i + 1,
+				Column:    match[0] + 1,
+				Message:   msg,
+				Fixable:   true,
+				Suggested: strongToStyle(line[match[0]:match[1]], style),
+			})
 		}
 	}
 	return violations
 }
 
 func (r *MD050) Fix(content string, path string) FixResult {
-	style := r.Style
-	if style == "" {
-		style = "**"
+	style := r.strongStyle()
+	lines := strings.Split(content, "\n")
+	fenced := markdown.LinesInFencedBlocks(content)
+	changed := false
+	for i, line := range lines {
+		if fenced[i] {
+			continue
+		}
+		var re *regexp.Regexp
+		if style == "**" {
+			re = md050UnderscoreStrong
+		} else {
+			re = md050AsteriskStrong
+		}
+		fixed := markdown.ReplaceOutsideInlineCode(line, re, func(m string) string {
+			return strongToStyle(m, style)
+		})
+		if fixed != line {
+			lines[i] = fixed
+			changed = true
+		}
 	}
+	return FixResult{Changed: changed, Lines: lines}
+}
 
-	var fixed string
-	if style == "**" {
-		fixed = regexp.MustCompile(`__([^_]+)__`).ReplaceAllString(content, "**$1**")
-	} else {
-		fixed = regexp.MustCompile(`\*\*([^*]+)\*\*`).ReplaceAllString(content, "__$1__")
+func (r *MD050) strongStyle() string {
+	if r.Style == "" {
+		return "**"
 	}
-	return FixResult{Changed: fixed != content, Lines: strings.Split(fixed, "\n")}
+	return r.Style
+}
+
+func strongToStyle(segment, style string) string {
+	inner := segment[2 : len(segment)-2]
+	if style == "**" {
+		return "**" + inner + "**"
+	}
+	return "__" + inner + "__"
 }
 
 type MD053 struct{}
