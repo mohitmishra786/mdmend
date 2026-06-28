@@ -9,4 +9,4 @@
 
 **pay-agent-skills** is a documentation repo.
 
-Visit https://example.com for more info.
+Visit <https://example.com> for more info.
