@@ -48,15 +48,14 @@ func (r *MD073) Lint(content string, path string) []Violation {
 }
 
 func findTOCRegion(lines []string) (tocRegion, bool) {
-	start, stop := -1, -1
+	start := -1
 	for i, line := range lines {
 		if tocMarkerStartRegex.MatchString(line) {
 			start = i + 1
 			continue
 		}
 		if start >= 0 && tocMarkerStopRegex.MatchString(line) {
-			stop = i
-			return tocRegion{start: start, stop: stop}, true
+			return tocRegion{start: start, stop: i}, true
 		}
 	}
 	return tocRegion{}, false

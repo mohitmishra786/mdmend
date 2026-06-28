@@ -14,10 +14,54 @@ RESULTS="${BENCH_DIR}/results.txt"
 SUMMARY="${BENCH_DIR}/summary.json"
 
 BIN="${ROOT}/mdmend"
+if [[ ! -x "$BIN" && -x "${BIN}.exe" ]]; then
+  BIN="${BIN}.exe"
+fi
 if [[ ! -x "$BIN" ]]; then
   echo "Building mdmend..."
-  go build -o "$BIN" ./cmd/mdmend
+  go build -o "${ROOT}/mdmend" ./cmd/mdmend
+  if [[ -x "${ROOT}/mdmend.exe" ]]; then
+    BIN="${ROOT}/mdmend.exe"
+  else
+    BIN="${ROOT}/mdmend"
+  fi
 fi
+
+BENCH_LABEL="${BENCH_LABEL:-local}"
+META="${BENCH_DIR}/meta.json"
+python3 - <<'PY' "$META" "$BENCH_LABEL" "$TIMESTAMP" "$WARMUP" "$RUNS"
+import json, os, platform, subprocess, sys
+
+meta_path, label, ts, warmup, runs = sys.argv[1:6]
+
+def run(cmd):
+    try:
+        return subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception:
+        return ""
+
+cpu = ""
+if platform.system() == "Darwin":
+    cpu = run("sysctl -n machdep.cpu.brand_string")
+elif platform.system() == "Linux":
+    cpu = run("grep -m1 'model name' /proc/cpuinfo | cut -d: -f2")
+
+payload = {
+    "label": label,
+    "timestamp": ts,
+    "warmup": int(warmup),
+    "runs": int(runs),
+    "os": platform.system(),
+    "arch": platform.machine(),
+    "python": platform.python_version(),
+    "cpu": cpu.strip(),
+    "go": run("go version"),
+    "node": run("node --version"),
+    "hyperfine": run("hyperfine --version"),
+}
+with open(meta_path, "w", encoding="utf-8") as fh:
+    json.dump(payload, fh, indent=2)
+PY
 
 if [[ ! -d "${ROOT}/testdata/benchmark/stress" ]]; then
   echo "Generating stress corpus..."
@@ -192,18 +236,19 @@ for idx in "${!CORPUS_NAMES[@]}"; do
   run_corpus_benchmark "${CORPUS_NAMES[$idx]}" "${CORPUS_PATHS[$idx]}"
 done
 
-python3 - <<'PY' "$BENCH_DIR" "$TIMESTAMP" "$WARMUP" "$RUNS" 2>/dev/null | tee "${SUMMARY}" || true
+python3 - <<'PY' "$BENCH_DIR" "$TIMESTAMP" "$WARMUP" "$RUNS" "$BENCH_LABEL" 2>/dev/null | tee "${SUMMARY}" || true
 import json, glob, os, sys
-bench_dir, ts, warmup, runs = sys.argv[1:5]
+bench_dir, ts, warmup, runs, label = sys.argv[1:6]
 entries = []
 for path in sorted(glob.glob(os.path.join(bench_dir, "*.json"))):
-    if path.endswith("summary.json"):
+    base = os.path.basename(path)
+    if base in ("summary.json", "meta.json", "latest.json", "hyperfine-export.json"):
         continue
     with open(path) as f:
         data = json.load(f)
     for result in data.get("results", []):
         entries.append({
-            "corpus": os.path.basename(path).replace(".json", ""),
+            "corpus": base.replace(".json", ""),
             "command": result.get("command", ""),
             "mean_ms": round(result.get("mean", 0) * 1000, 2),
             "stddev_ms": round(result.get("stddev", 0) * 1000, 2),
@@ -211,6 +256,7 @@ for path in sorted(glob.glob(os.path.join(bench_dir, "*.json"))):
             "max_ms": round(result.get("max", 0) * 1000, 2),
         })
 print(json.dumps({
+    "label": label,
     "timestamp": ts,
     "warmup": int(warmup),
     "runs": int(runs),

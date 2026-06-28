@@ -460,6 +460,8 @@ Measured on Apple Silicon macOS (June 2026). Competitors run their default lint 
 | Low | Optional `mdmend lint --profile` flag for per-rule timing | Helps contributors optimize the slowest rules |
 | Low | Compare fix throughput with rumdl `--fix` when parity rules align | Apples-to-apples auto-fix benchmarking |
 
+**Live CI charts:** after the weekly benchmark workflow runs, see [GitHub Pages benchmark dashboard](https://mohitmishra786.github.io/mdmend/dev/bench/) (enable Pages from the `gh-pages` branch on first run). Historical JSON is stored under `docs/benchmarks/history/`.
+
 Contributions welcome on any item above — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Tech Stack

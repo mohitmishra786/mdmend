@@ -58,9 +58,25 @@ Results are written to:
 - Competitors implement different rule sets; raw timings compare *throughput*, not identical work.
 - Stress corpus emphasizes tables, code fences, lists, footnotes, and TOC markers to pressure parsers and rule scanners.
 
-## CI
+## CI (multi-platform)
 
-The [Benchmark workflow](../.github/workflows/benchmark.yml) runs weekly and on demand, uploading `docs/benchmarks/` as an artifact.
+The [Benchmark workflow](../.github/workflows/benchmark.yml) runs **weekly** (Monday 03:00 UTC) and on `workflow_dispatch` across:
+
+| Runner | Label |
+|--------|-------|
+| `ubuntu-24.04` | `linux-x64` |
+| `ubuntu-24.04-arm` | `linux-arm64` |
+| `ubuntu-22.04` | `linux-22.04-x64` |
+| `windows-latest` | `windows-x64` |
+| `macos-latest` | `macos-arm64` |
+
+Results are:
+
+- **Artifacts** — per-runner JSON (90-day retention)
+- **History** — committed to `docs/benchmarks/history/<date>/` on the default branch
+- **Charts** — published to GitHub Pages (`gh-pages` branch) at `https://mohitmishra786.github.io/mdmend/dev/bench/` after you enable Pages → **Deploy from branch** → `gh-pages` / `/ (root)`
+
+Enable Pages once the first benchmark workflow creates the `gh-pages` branch.
 
 ## Latest results
 
