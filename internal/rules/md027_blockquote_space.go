@@ -58,16 +58,15 @@ func (r *MD030) Name() string        { return "list-marker-space" }
 func (r *MD030) Description() string { return "Spaces after list markers" }
 func (r *MD030) Fixable() bool       { return true }
 
-var unorderedListMarkerRegex = regexp.MustCompile(`^(\s*)([-*+])  +(\S)`)
+var unorderedListMarkerRegex = regexp.MustCompile(`^(\s*)([-+*])  +(\S)`)
 var orderedListMarkerRegex = regexp.MustCompile(`^(\s*)(\d+[.)])  +(\S)`)
-var unorderedListNoSpaceRegex = regexp.MustCompile(`^(\s*)([-*+])(\S)`)
 var orderedListNoSpaceRegex = regexp.MustCompile(`^(\s*)(\d+[.)])(\S)`)
 
 func (r *MD030) Lint(content string, path string) []Violation {
 	var violations []Violation
 	lines := strings.Split(content, "\n")
 	for i, line := range lines {
-		if unorderedListNoSpaceRegex.MatchString(line) || orderedListNoSpaceRegex.MatchString(line) {
+		if unorderedListMissingSpace(line) || orderedListNoSpaceRegex.MatchString(line) {
 			violations = append(violations, Violation{
 				Rule:    r.ID(),
 				Line:    i + 1,
@@ -92,8 +91,8 @@ func (r *MD030) Fix(content string, path string) FixResult {
 	lines := strings.Split(content, "\n")
 	changed := false
 	for i, line := range lines {
-		if unorderedListNoSpaceRegex.MatchString(line) {
-			lines[i] = unorderedListNoSpaceRegex.ReplaceAllString(line, "$1$2 $3")
+		if indent, marker, rest, ok := unorderedListMissingSpaceParts(line); ok {
+			lines[i] = indent + marker + " " + rest
 			changed = true
 		} else if orderedListNoSpaceRegex.MatchString(line) {
 			lines[i] = orderedListNoSpaceRegex.ReplaceAllString(line, "$1$2 $3")
@@ -107,6 +106,38 @@ func (r *MD030) Fix(content string, path string) FixResult {
 		}
 	}
 	return FixResult{Changed: changed, Lines: lines}
+}
+
+func isStrongEmphasisLine(line string) bool {
+	trimmed := strings.TrimLeft(line, " \t")
+	return strings.HasPrefix(trimmed, "**") || strings.HasPrefix(trimmed, "__")
+}
+
+func unorderedListMissingSpace(line string) bool {
+	_, _, _, ok := unorderedListMissingSpaceParts(line)
+	return ok
+}
+
+func unorderedListMissingSpaceParts(line string) (indent, marker, rest string, ok bool) {
+	if isStrongEmphasisLine(line) {
+		return "", "", "", false
+	}
+	trimmed := strings.TrimLeft(line, " \t")
+	if len(trimmed) < 2 || trimmed[1] == ' ' {
+		return "", "", "", false
+	}
+	indent = line[:len(line)-len(trimmed)]
+	switch trimmed[0] {
+	case '-', '+':
+		return indent, string(trimmed[0]), trimmed[1:], true
+	case '*':
+		if len(trimmed) >= 2 && trimmed[1] == '*' {
+			return "", "", "", false
+		}
+		return indent, "*", trimmed[1:], true
+	default:
+		return "", "", "", false
+	}
 }
 
 type MD031 struct{}

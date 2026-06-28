@@ -2482,6 +2482,139 @@ func TestMD051SlugGeneration(t *testing.T) {
 	}
 }
 
+func TestMD001(t *testing.T) {
+	rule := &MD001{}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantViol int
+	}{
+		{
+			name:     "increment by one",
+			input:    "# Heading 1\n## Heading 2\n### Heading 3\n",
+			wantViol: 0,
+		},
+		{
+			name:     "skip level",
+			input:    "# Heading 1\n### Heading 3\n",
+			wantViol: 1,
+		},
+		{
+			name:     "same level repeat",
+			input:    "## Heading\n## Another\n",
+			wantViol: 0,
+		},
+		{
+			name:     "decrease level",
+			input:    "### Heading\n## Subheading\n",
+			wantViol: 0,
+		},
+		{
+			name:     "setext headings",
+			input:    "Heading 1\n===\nSubheading\n---\n",
+			wantViol: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD001.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD001Fix(t *testing.T) {
+	rule := &MD001{}
+
+	input := "# Heading\n### Skipped\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD001.Fix() should never change content")
+	}
+}
+
+func TestMD029(t *testing.T) {
+	tests := []struct {
+		name     string
+		style    string
+		input    string
+		wantViol int
+	}{
+		{
+			name:     "one style valid",
+			style:    "one",
+			input:    "1. First\n1. Second\n1. Third\n",
+			wantViol: 0,
+		},
+		{
+			name:     "one style invalid",
+			style:    "one",
+			input:    "1. First\n2. Second\n",
+			wantViol: 1,
+		},
+		{
+			name:     "ordered style valid",
+			style:    "ordered",
+			input:    "1. First\n2. Second\n3. Third\n",
+			wantViol: 0,
+		},
+		{
+			name:     "ordered style skip",
+			style:    "ordered",
+			input:    "1. First\n3. Third\n",
+			wantViol: 1,
+		},
+		{
+			name:     "zero style valid",
+			style:    "zero",
+			input:    "0. First\n0. Second\n",
+			wantViol: 0,
+		},
+		{
+			name:     "one_or_ordered accepts one",
+			style:    "one_or_ordered",
+			input:    "1. First\n1. Second\n",
+			wantViol: 0,
+		},
+		{
+			name:     "one_or_ordered accepts ordered",
+			style:    "one_or_ordered",
+			input:    "1. First\n2. Second\n",
+			wantViol: 0,
+		},
+		{
+			name:     "one_or_ordered rejects mixed",
+			style:    "one_or_ordered",
+			input:    "1. First\n3. Third\n",
+			wantViol: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule := &MD029{Style: tt.style}
+			violations := rule.Lint(tt.input, "test.md")
+			if len(violations) != tt.wantViol {
+				t.Errorf("MD029.Lint() got %d violations, want %d", len(violations), tt.wantViol)
+			}
+		})
+	}
+}
+
+func TestMD029Fix(t *testing.T) {
+	rule := &MD029{Style: "ordered"}
+
+	input := "1. First\n3. Third\n"
+	result := rule.Fix(input, "test.md")
+	if result.Changed {
+		t.Error("MD029.Fix() should never change content")
+	}
+}
+
 func TestMD056MultipleTables(t *testing.T) {
 	rule := &MD056{PadShortRows: true}
 

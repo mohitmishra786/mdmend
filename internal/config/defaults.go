@@ -1,11 +1,14 @@
 package config
 
 type Config struct {
-	Disable    []string              `yaml:"disable"`
-	Rules      map[string]RuleConfig `yaml:"rules"`
-	Ignore     []string              `yaml:"ignore"`
-	TabSize    int                   `yaml:"tab_size"`
-	Aggressive bool                  `yaml:"aggressive"`
+	Disable       []string              `yaml:"disable"`
+	Only          []string              `yaml:"only"`
+	Rules         map[string]RuleConfig `yaml:"rules"`
+	Ignore        []string              `yaml:"ignore"`
+	TabSize       int                   `yaml:"tab_size"`
+	Aggressive    bool                  `yaml:"aggressive"`
+	Flavor        string                `yaml:"flavor"`
+	PerFileFlavor map[string]string     `yaml:"per_file_flavor"`
 }
 
 type RuleConfig struct {
@@ -72,12 +75,24 @@ func boolPtr(v bool) *bool {
 }
 
 func (c *Config) IsDisabled(ruleID string) bool {
+	return !c.IsEnabled(ruleID)
+}
+
+func (c *Config) IsEnabled(ruleID string) bool {
+	if len(c.Only) > 0 {
+		for _, id := range c.Only {
+			if id == ruleID {
+				return true
+			}
+		}
+		return false
+	}
 	for _, id := range c.Disable {
 		if id == ruleID {
-			return true
+			return false
 		}
 	}
-	return false
+	return true
 }
 
 func (c *Config) GetRuleConfig(ruleID string) RuleConfig {

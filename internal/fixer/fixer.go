@@ -15,7 +15,7 @@ type Fixer struct {
 func New(cfg *config.Config) *Fixer {
 	var enabledRules []rules.Rule
 	for _, r := range rules.OrderedForFix() {
-		if !cfg.IsDisabled(r.ID()) {
+		if cfg.IsEnabled(r.ID()) {
 			// Clone aggressive rules to avoid mutating global instances
 			if ar, ok := r.(rules.AggressiveRule); ok {
 				// Create a copy of the rule with the aggressive flag set

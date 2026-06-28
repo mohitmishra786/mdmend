@@ -47,7 +47,11 @@ func loadYAML(data []byte, cfg *Config) (*Config, error) {
 }
 
 func loadJSON(data []byte, cfg *Config) (*Config, error) {
-	return cfg, nil
+	parsed, err := ParseMarkdownlintJSON(data)
+	if err != nil {
+		return nil, err
+	}
+	return parsed, nil
 }
 
 func LoadIgnorePatterns(path string) ([]string, error) {

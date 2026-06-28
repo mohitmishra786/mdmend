@@ -15,7 +15,7 @@ type Linter struct {
 func New(cfg *config.Config) *Linter {
 	var enabledRules []rules.Rule
 	for _, r := range rules.All() {
-		if !cfg.IsDisabled(r.ID()) {
+		if cfg.IsEnabled(r.ID()) {
 			enabledRules = append(enabledRules, r)
 		}
 	}

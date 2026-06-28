@@ -4,6 +4,8 @@
 */*/*/bin/
 */*/*/*/bin/
 mdmend
+docs/benchmarks/*
+!docs/benchmarks/.gitkeep
 *.exe
 *.exe~
 *.dll

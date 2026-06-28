@@ -1,0 +1,31 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+  schedule:
+    cron: "0 8 * * 1"
+
+jobs:
+  benchmark:
+    name: Benchmark mdmend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Build mdmend
+        run: go build -o mdmend ./cmd/mdmend
+
+      - name: Install hyperfine
+        run: cargo install hyperfine 2>/dev/null || sudo apt-get update && sudo apt-get install -y hyperfine
+
+      - name: Run benchmark script
+        run: bash scripts/benchmark.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: docs/benchmarks/

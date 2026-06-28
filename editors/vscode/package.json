@@ -1,0 +1,85 @@
+{
+  "name": "mdmend",
+  "displayName": "mdmend",
+  "description": "Markdown linting and fixing with mdmend",
+  "version": "0.1.0",
+  "publisher": "mohitmishra786",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Linters",
+    "Formatters"
+  ],
+  "keywords": [
+    "markdown",
+    "lint",
+    "mdmend",
+    "markdownlint"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mdmend.lint",
+        "title": "mdmend: Lint Current File"
+      },
+      {
+        "command": "mdmend.fix",
+        "title": "mdmend: Fix Current File"
+      },
+      {
+        "command": "mdmend.lintWorkspace",
+        "title": "mdmend: Lint Workspace"
+      }
+    ],
+    "configuration": {
+      "title": "mdmend",
+      "properties": {
+        "mdmend.path": {
+          "type": "string",
+          "default": "mdmend",
+          "description": "Path to the mdmend binary."
+        },
+        "mdmend.lintOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run mdmend lint when saving Markdown files."
+        },
+        "mdmend.lintOnOpen": {
+          "type": "boolean",
+          "default": false,
+          "description": "Run mdmend lint when opening Markdown files."
+        },
+        "mdmend.config": {
+          "type": "string",
+          "default": "",
+          "description": "Path to mdmend config file (default: auto-detect .mdmend.yml)."
+        },
+        "mdmend.extraArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Extra CLI arguments passed to mdmend (e.g. --rules ~MD013)."
+        },
+        "mdmend.fixOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Run mdmend fix when saving Markdown files."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0"
+  }
+}
