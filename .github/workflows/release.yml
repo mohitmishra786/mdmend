@@ -45,13 +45,13 @@ jobs:
       - name: Prepare AUR-only GoReleaser config
         if: inputs.aur_only == true
         run: |
-          awk '/^release:/{print; print "  skip_upload: true"; next}1' .goreleaser.yml > .goreleaser.aur.yml
+          awk '/^release:/{print; print "  skip_upload: true"; next}1' .goreleaser.yml > /tmp/goreleaser.aur.yml
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
-          args: ${{ inputs.aur_only == true && 'release --clean --config .goreleaser.aur.yml --skip=snapcraft,homebrew,scoop,nfpm,announce' || 'release --clean --skip=snapcraft' }}
+          args: ${{ inputs.aur_only == true && 'release --clean --config /tmp/goreleaser.aur.yml --skip=snapcraft,homebrew,scoop,nfpm,announce' || 'release --clean --skip=snapcraft' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
