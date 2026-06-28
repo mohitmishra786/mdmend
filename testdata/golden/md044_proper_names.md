@@ -1,4 +1,4 @@
 # Test File
 
-Check out GitHub and JavaScript info.
-Also TypeScript and macOS.
+Check out github.com and javascript info.
+Also typescript and macos.

@@ -887,7 +887,22 @@ func loadConfig(opts globalOptions) (*config.Config, error) {
 		}
 	}
 
+	if opts.only != "" {
+		cfg.Only = parseRuleList(opts.only)
+	}
+
 	return cfg, nil
+}
+
+func parseRuleList(value string) []string {
+	var ids []string
+	for _, r := range strings.Split(value, ",") {
+		r = strings.TrimSpace(r)
+		if r != "" {
+			ids = append(ids, strings.ToUpper(r))
+		}
+	}
+	return ids
 }
 
 func applyOnlyFilter(violations []rules.Violation, only string) []rules.Violation {
