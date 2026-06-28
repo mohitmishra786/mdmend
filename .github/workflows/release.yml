@@ -48,7 +48,7 @@ jobs:
           awk '/^release:/{print; print "  skip_upload: true"; next}1' .goreleaser.yml > /tmp/goreleaser.aur.yml
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           version: latest
           args: ${{ inputs.aur_only == true && 'release --clean --config /tmp/goreleaser.aur.yml --skip=snapcraft,homebrew,scoop,nfpm,announce' || 'release --clean --skip=snapcraft' }}
