@@ -3,12 +3,45 @@ name: Benchmark
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * 1"
+    - cron: "0 3 * * 1"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/benchmark.yml"
+      - "scripts/benchmark.sh"
+      - "scripts/install_benchmark_deps.sh"
+      - "scripts/generate_stress_corpus.sh"
+      - "scripts/merge_benchmark_results.py"
+
+permissions:
+  contents: write
+  pages: write
+  deployments: write
+  id-token: write
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   benchmark:
-    name: Benchmark mdmend
-    runs-on: ubuntu-latest
+    name: Benchmark (${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            label: linux-x64
+          - os: ubuntu-24.04-arm
+            label: linux-arm64
+          - os: ubuntu-22.04
+            label: linux-22.04-x64
+          - os: windows-latest
+            label: windows-x64
+          - os: macos-latest
+            label: macos-arm64
     steps:
       - uses: actions/checkout@v7
 
@@ -16,16 +49,107 @@ jobs:
         with:
           go-version: "1.25"
 
-      - name: Build mdmend
-        run: go build -o mdmend ./cmd/mdmend
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
-      - name: Install hyperfine
-        run: cargo install hyperfine 2>/dev/null || sudo apt-get update && sudo apt-get install -y hyperfine
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Run benchmark script
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install benchmark dependencies
+        shell: bash
+        run: bash scripts/install_benchmark_deps.sh
+
+      - name: Run benchmark suite
+        shell: bash
+        env:
+          BENCH_RUNS: "3"
+          BENCH_WARMUP: "1"
+          BENCH_LABEL: ${{ matrix.label }}
         run: bash scripts/benchmark.sh
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v4
         with:
-          name: benchmark-results
+          name: benchmark-${{ matrix.label }}
           path: docs/benchmarks/
+          retention-days: 90
+
+  aggregate:
+    name: Aggregate and publish
+    needs: benchmark
+    runs-on: ubuntu-24.04
+    if: always() && needs.benchmark.result != 'cancelled'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download benchmark artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: benchmark-*
+          merge-multiple: false
+
+      - name: Merge results
+        run: |
+          python3 scripts/merge_benchmark_results.py artifacts docs/benchmarks
+          ls -la docs/benchmarks/history || true
+          test -s docs/benchmarks/hyperfine-export.json
+          python3 -c "import json; d=json.load(open('docs/benchmarks/hyperfine-export.json')); print(f'export entries: {len(d)}')"
+
+      - name: Commit benchmark history
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/benchmarks/history/
+          if git diff --staged --quiet; then
+            echo "No benchmark history changes to commit"
+          else
+            git commit -m "bench: weekly results $(date -u +%Y-%m-%d)"
+            git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
+          fi
+
+      - name: Ensure gh-pages branch exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads "$remote" gh-pages >/dev/null 2>&1; then
+            echo "gh-pages branch already exists"
+            exit 0
+          fi
+          worktree="$(mktemp -d)"
+          cd "$worktree"
+          git init
+          git checkout --orphan gh-pages
+          touch .nojekyll
+          mkdir -p dev/bench
+          git add .nojekyll dev/bench
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Initialize gh-pages for benchmark dashboard"
+          git branch -M gh-pages
+          git remote add origin "$remote"
+          git push -u origin gh-pages
+          echo "Created gh-pages branch"
+
+      - name: Publish benchmark charts (gh-pages)
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: mdmend lint benchmarks
+          tool: customSmallerIsBetter
+          output-file-path: docs/benchmarks/hyperfine-export.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          benchmark-data-dir-path: dev/bench
+          gh-pages-branch: gh-pages
+          fail-on-alert: false
+          skip-fetch-gh-pages: false

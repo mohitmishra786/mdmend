@@ -4,7 +4,7 @@
 
 *Mend your Markdown. Instantly.*
 
-Fast, zero-dependency Markdown linter and fixer. 50 rules. 38 auto-fixable.
+Fast, zero-dependency Markdown linter and fixer. 57 rules. 40 auto-fixable.
 
 [![GitHub Release](https://img.shields.io/github/v/release/mohitmishra786/mdmend?style=flat-square&color=blue)](https://github.com/mohitmishra786/mdmend/releases)
 [![NPM Version](https://img.shields.io/npm/v/@mohitmishra7/mdmend?style=flat-square&color=007acc)](https://www.npmjs.com/package/@mohitmishra7/mdmend)
@@ -14,7 +14,7 @@ Fast, zero-dependency Markdown linter and fixer. 50 rules. 38 auto-fixable.
 
 Single static binary. No Node or Python runtime required.
 
-**Performance** (this repo, 57 markdown files): lint ~7 ms, fix dry run ~28 ms. Corpus lint ~3 ms. Run `make benchmark` for local timings; CI runs weekly via `.github/workflows/benchmark.yml`.
+**Performance:** lint **~7 ms** on a 200-file stress corpus — fastest among tested linters. See [Benchmarks](#benchmarks).
 
 </div>
 
@@ -220,7 +220,7 @@ mdmend rules info MD040
 
 ## Supported Rules
 
-50 rules total. 38 auto-fixable.
+57 rules total. 40 auto-fixable.
 
 ### Auto-Fixable
 
@@ -258,6 +258,8 @@ mdmend rules info MD040
 | MD055 | Table pipe style |
 | MD056 | Table column count |
 | MD058 | Table blank lines |
+| MD070 | Nested markdown fence length (opt-in) |
+| MD073 | Table of contents validation (opt-in) |
 
 ### Heuristic (Smart Inference)
 
@@ -276,6 +278,11 @@ mdmend rules info MD040
 | MD025 | Multiple top-level headings |
 | MD029 | Ordered list item prefix style |
 | MD033 | Inline HTML |
+| MD046 | Code block style consistency |
+| MD054 | Link and image style consistency |
+| MD066 | Footnote reference validation |
+| MD067 | Footnote definition order |
+| MD068 | Empty footnote definitions |
 | MD036 | Emphasis as heading |
 | MD041 | First line heading |
 | MD045 | Image alt text |
@@ -410,6 +417,53 @@ A minimal extension lives in [`editors/vscode/`](editors/vscode/). It runs `mdme
 mdmend server
 ```
 
+## Benchmarks
+
+mdmend is benchmarked against other Markdown linters using [hyperfine](https://github.com/sharkdp/hyperfine) across multiple corpora. Reproduce locally with `make benchmark` or read the full methodology in [docs/BENCHMARKS.md](docs/BENCHMARKS.md). CI runs the suite weekly and uploads artifacts.
+
+### Stress corpus (200 files, ~1.38 MB)
+
+Measured on Apple Silicon macOS (June 2026). Competitors run their default lint commands; timings measure throughput, not identical rule coverage.
+
+| Tool | Command | Mean time | vs mdmend lint |
+|------|---------|-----------|----------------|
+| **mdmend** | `mdmend lint` | **6.7 ms** | 1.0× (baseline) |
+| [rumdl](https://github.com/rvben/rumdl) | `rumdl check` | 25.1 ms | 3.7× slower |
+| mdmend | `mdmend fix --dry-run` | 317 ms | 47× slower |
+| [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) | `markdownlint-cli2 **/*.md` | 1.45 s | 215× slower |
+| [pymarkdown](https://github.com/jackdewinter/pymarkdown) | `pymarkdown scan` | 10.8 s | 1,602× slower |
+
+### Medium corpus (237 files, ~1.38 MB)
+
+| Tool | Mean time |
+|------|-----------|
+| mdmend lint | 7.6 ms |
+| mdmend fix --dry-run | 377 ms |
+| markdownlint-cli2 | 623 ms |
+
+### Why mdmend is fast
+
+- Single static Go binary — no Node, Python, or Rust runtime startup per invocation
+- Parallel file processing with a worker pool (`--workers`)
+- Phase-ordered rule execution avoids redundant passes
+- File-hash cache skips unchanged files on repeat runs (`--no-cache` to disable)
+
+### Roadmap (performance)
+
+| Priority | Plan | Expected impact |
+|----------|------|-----------------|
+| High | Incremental lint via `--watch` + cache warming | Near-zero cost on single-file edits in large repos |
+| High | SIMD / batch line scanning for hot rules (MD009, MD010, MD013) | Lower per-byte cost on megabyte-scale files |
+| Medium | Rule-level short-circuit when a file has no matching constructs | Skip MD056 on files with no tables, etc. |
+| Medium | Publish multi-platform CI benchmark dashboard (Linux/macOS/Windows) | Reproducible cross-OS comparison tables in README |
+| Medium | Memory profiling on stress corpus; cap allocations in fix pipeline | Stable performance under 10k+ file monorepos |
+| Low | Optional `mdmend lint --profile` flag for per-rule timing | Helps contributors optimize the slowest rules |
+| Low | Compare fix throughput with rumdl `--fix` when parity rules align | Apples-to-apples auto-fix benchmarking |
+
+**Live CI charts:** after the weekly benchmark workflow runs, see [GitHub Pages benchmark dashboard](https://mohitmishra786.github.io/mdmend/dev/bench/) (enable Pages from the `gh-pages` branch on first run). Historical JSON is stored under `docs/benchmarks/history/`.
+
+Contributions welcome on any item above — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Tech Stack
 
 | Component | Technology | Purpose |
@@ -433,6 +487,7 @@ The tool is intentionally minimal. No framework, no runtime dependencies, just s
 - [docs/MIGRATION.md](docs/MIGRATION.md) — Migrating from markdownlint
 - [docs/ENTERPRISE.md](docs/ENTERPRISE.md) — Org deployment patterns
 - [docs/RULE_AUDIT.md](docs/RULE_AUDIT.md) — Rule coverage audit
+- [docs/BENCHMARKS.md](docs/BENCHMARKS.md) — Benchmark methodology and results
 - [editors/vscode/README.md](editors/vscode/README.md) — VS Code extension
 
 ## License

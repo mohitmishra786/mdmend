@@ -88,11 +88,11 @@ func MaskInlineCode(line string) string {
 }
 
 type FenceState struct {
-	InBlock    bool
-	OpenLine   int
-	FenceChar  byte
-	FenceLen   int
-	Indent     string
+	InBlock   bool
+	OpenLine  int
+	FenceChar byte
+	FenceLen  int
+	Indent    string
 }
 
 func NewFenceState() *FenceState {

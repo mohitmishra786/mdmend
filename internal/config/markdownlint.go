@@ -9,12 +9,12 @@ import (
 )
 
 type markdownlintConfig struct {
-	Default  *bool                     `json:"default"`
-	Disable  []string                  `json:"disable"`
-	TabSize  int                       `json:"tab_size"`
-	Rules    map[string]json.RawMessage `json:"rules"`
-	Ignores  []string                  `json:"ignores"`
-	Ignore   []string                  `json:"ignore"`
+	Default *bool                      `json:"default"`
+	Disable []string                   `json:"disable"`
+	TabSize int                        `json:"tab_size"`
+	Rules   map[string]json.RawMessage `json:"rules"`
+	Ignores []string                   `json:"ignores"`
+	Ignore  []string                   `json:"ignore"`
 }
 
 func ParseMarkdownlintJSON(data []byte) (*Config, error) {

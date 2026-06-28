@@ -11,10 +11,12 @@ func init() {
 	Register(&MD001{})
 }
 
-func (r *MD001) ID() string          { return "MD001" }
-func (r *MD001) Name() string        { return "heading-increment" }
-func (r *MD001) Description() string { return "Heading levels should only increment by one level at a time" }
-func (r *MD001) Fixable() bool       { return false }
+func (r *MD001) ID() string   { return "MD001" }
+func (r *MD001) Name() string { return "heading-increment" }
+func (r *MD001) Description() string {
+	return "Heading levels should only increment by one level at a time"
+}
+func (r *MD001) Fixable() bool { return false }
 
 func (r *MD001) Lint(content string, path string) []Violation {
 	var violations []Violation

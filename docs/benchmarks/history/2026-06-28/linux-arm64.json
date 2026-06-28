@@ -1,0 +1,140 @@
+{
+  "label": "linux-arm64",
+  "meta": {
+    "label": "linux-arm64",
+    "timestamp": "2026-06-28T10:10:17Z",
+    "warmup": 1,
+    "runs": 3,
+    "os": "Linux",
+    "arch": "aarch64",
+    "python": "3.12.13",
+    "cpu": "",
+    "go": "go version go1.25.11 linux/arm64",
+    "node": "v22.23.0",
+    "hyperfine": "hyperfine 1.18.0"
+  },
+  "warmup": 1,
+  "runs": 3,
+  "results": [
+    {
+      "corpus": "medium",
+      "command": "/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata --quiet --exit-zero",
+      "mean_ms": 3.29,
+      "stddev_ms": 0.01,
+      "min_ms": 3.28,
+      "max_ms": 3.3
+    },
+    {
+      "corpus": "medium",
+      "command": "/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata --dry-run --quiet --exit-zero",
+      "mean_ms": 7.06,
+      "stddev_ms": 0.04,
+      "min_ms": 7.02,
+      "max_ms": 7.11
+    },
+    {
+      "corpus": "medium",
+      "command": "npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/**/*.md",
+      "mean_ms": 673.76,
+      "stddev_ms": 3.31,
+      "min_ms": 669.94,
+      "max_ms": 675.76
+    },
+    {
+      "corpus": "medium",
+      "command": "rumdl check /home/runner/work/mdmend/mdmend/testdata",
+      "mean_ms": 9.88,
+      "stddev_ms": 0.46,
+      "min_ms": 9.6,
+      "max_ms": 10.42
+    },
+    {
+      "corpus": "medium",
+      "command": "pymarkdown scan /home/runner/work/mdmend/mdmend/testdata",
+      "mean_ms": 178.5,
+      "stddev_ms": 1.89,
+      "min_ms": 176.7,
+      "max_ms": 180.47
+    },
+    {
+      "corpus": "small",
+      "command": "/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata/corpus --quiet --exit-zero",
+      "mean_ms": 2.94,
+      "stddev_ms": 0.03,
+      "min_ms": 2.91,
+      "max_ms": 2.97
+    },
+    {
+      "corpus": "small",
+      "command": "/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata/corpus --dry-run --quiet --exit-zero",
+      "mean_ms": 3.34,
+      "stddev_ms": 0.15,
+      "min_ms": 3.19,
+      "max_ms": 3.49
+    },
+    {
+      "corpus": "small",
+      "command": "npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/corpus/**/*.md",
+      "mean_ms": 611.79,
+      "stddev_ms": 9.86,
+      "min_ms": 603.13,
+      "max_ms": 622.53
+    },
+    {
+      "corpus": "small",
+      "command": "rumdl check /home/runner/work/mdmend/mdmend/testdata/corpus",
+      "mean_ms": 10.05,
+      "stddev_ms": 1.29,
+      "min_ms": 8.8,
+      "max_ms": 11.37
+    },
+    {
+      "corpus": "small",
+      "command": "pymarkdown scan /home/runner/work/mdmend/mdmend/testdata/corpus",
+      "mean_ms": 194.79,
+      "stddev_ms": 2.09,
+      "min_ms": 192.52,
+      "max_ms": 196.64
+    },
+    {
+      "corpus": "stress",
+      "command": "/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata/benchmark/stress --quiet --exit-zero",
+      "mean_ms": 2.7,
+      "stddev_ms": 0.06,
+      "min_ms": 2.64,
+      "max_ms": 2.76
+    },
+    {
+      "corpus": "stress",
+      "command": "/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata/benchmark/stress --dry-run --quiet --exit-zero",
+      "mean_ms": 2.74,
+      "stddev_ms": 0.05,
+      "min_ms": 2.68,
+      "max_ms": 2.79
+    },
+    {
+      "corpus": "stress",
+      "command": "npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/benchmark/stress/**/*.md",
+      "mean_ms": 590.26,
+      "stddev_ms": 8.22,
+      "min_ms": 584.69,
+      "max_ms": 599.7
+    },
+    {
+      "corpus": "stress",
+      "command": "rumdl check /home/runner/work/mdmend/mdmend/testdata/benchmark/stress",
+      "mean_ms": 3.07,
+      "stddev_ms": 0.14,
+      "min_ms": 2.95,
+      "max_ms": 3.22
+    },
+    {
+      "corpus": "stress",
+      "command": "pymarkdown scan /home/runner/work/mdmend/mdmend/testdata/benchmark/stress",
+      "mean_ms": 190.53,
+      "stddev_ms": 2.53,
+      "min_ms": 187.68,
+      "max_ms": 192.52
+    }
+  ]
+}

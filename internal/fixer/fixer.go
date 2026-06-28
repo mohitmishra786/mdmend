@@ -13,38 +13,9 @@ type Fixer struct {
 }
 
 func New(cfg *config.Config) *Fixer {
-	var enabledRules []rules.Rule
-	for _, r := range rules.OrderedForFix() {
-		if cfg.IsEnabled(r.ID()) {
-			// Clone aggressive rules to avoid mutating global instances
-			if ar, ok := r.(rules.AggressiveRule); ok {
-				// Create a copy of the rule with the aggressive flag set
-				cloned := cloneAggressiveRule(ar, cfg.Aggressive)
-				enabledRules = append(enabledRules, cloned)
-			} else {
-				enabledRules = append(enabledRules, r)
-			}
-		}
-	}
 	return &Fixer{
 		config: cfg,
-		rules:  enabledRules,
-	}
-}
-
-func cloneAggressiveRule(ar rules.AggressiveRule, aggressive bool) rules.Rule {
-	switch r := ar.(type) {
-	case *rules.MD040:
-		clone := *r
-		clone.Aggressive = aggressive
-		return &clone
-	case *rules.MD051:
-		clone := *r
-		clone.Aggressive = aggressive
-		return &clone
-	default:
-		// Fallback: just return the original rule
-		return ar
+		rules:  rules.EnabledRules(cfg, true),
 	}
 }
 

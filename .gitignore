@@ -6,6 +6,9 @@
 mdmend
 docs/benchmarks/*
 !docs/benchmarks/.gitkeep
+!docs/benchmarks/history/
+!docs/benchmarks/history/**
+testdata/benchmark/stress/*.md
 *.exe
 *.exe~
 *.dll

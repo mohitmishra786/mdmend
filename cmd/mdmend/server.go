@@ -67,10 +67,10 @@ type jsonRPCNotification struct {
 }
 
 type textDocumentItem struct {
-	URI     string `json:"uri"`
+	URI        string `json:"uri"`
 	LanguageID string `json:"languageId"`
-	Version int    `json:"version"`
-	Text    string `json:"text"`
+	Version    int    `json:"version"`
+	Text       string `json:"text"`
 }
 
 type didOpenParams struct {
@@ -78,8 +78,8 @@ type didOpenParams struct {
 }
 
 type publishDiagnosticsParams struct {
-	URI         string              `json:"uri"`
-	Diagnostics []lspDiagnostic     `json:"diagnostics"`
+	URI         string          `json:"uri"`
+	Diagnostics []lspDiagnostic `json:"diagnostics"`
 }
 
 type lspDiagnostic struct {
@@ -270,8 +270,8 @@ func publishDiagnostics(writer io.Writer, uri string, violations []mdmend.Violat
 		Diagnostics: diagnostics,
 	}
 	data, err := json.Marshal(struct {
-		JSONRPC string                  `json:"jsonrpc"`
-		Method  string                  `json:"method"`
+		JSONRPC string                   `json:"jsonrpc"`
+		Method  string                   `json:"method"`
 		Params  publishDiagnosticsParams `json:"params"`
 	}{
 		JSONRPC: notification.JSONRPC,

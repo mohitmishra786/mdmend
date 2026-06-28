@@ -87,6 +87,7 @@ func RulesByPhase(phase Phase) []Rule {
 		"MD022": PhaseStructure,
 		"MD028": PhaseStructure,
 		"MD029": PhaseStructure,
+		"MD046": PhaseStructure,
 		"MD031": PhaseStructure,
 		"MD032": PhaseStructure,
 		"MD041": PhaseStructure,
@@ -110,11 +111,16 @@ func RulesByPhase(phase Phase) []Rule {
 		"MD037": PhaseInline,
 		"MD038": PhaseInline,
 		"MD039": PhaseInline,
+		"MD044": PhaseInline,
 		"MD042": PhaseInline,
 		"MD043": PhaseInline,
 		"MD051": PhaseInline,
 		"MD052": PhaseInline,
+		"MD054": PhaseInline,
 		"MD057": PhaseInline,
+		"MD066": PhaseInline,
+		"MD067": PhaseInline,
+		"MD068": PhaseInline,
 
 		"MD013": PhaseStyle,
 		"MD035": PhaseStyle,
@@ -129,6 +135,8 @@ func RulesByPhase(phase Phase) []Rule {
 		"MD040": PhaseHeuristic,
 
 		"MD053": PhaseCleanup,
+		"MD070": PhaseCleanup,
+		"MD073": PhaseCleanup,
 	}
 
 	mu.RLock()

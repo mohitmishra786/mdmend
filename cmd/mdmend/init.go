@@ -12,7 +12,7 @@ import (
 type initOptions struct {
 	fromMarkdownlint string
 	output           string
-	force              bool
+	force            bool
 }
 
 func newInitCmd() *cobra.Command {
