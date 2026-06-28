@@ -12,6 +12,10 @@ Fast, zero-dependency Markdown linter and fixer. 50 rules. 38 auto-fixable.
 [![Go Report Card](https://goreportcard.com/badge/github.com/mohitmishra786/mdmend?style=flat-square)](https://goreportcard.com/report/github.com/mohitmishra786/mdmend)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
+Single static binary. No Node or Python runtime required.
+
+**Performance** (this repo, 57 markdown files): lint ~7 ms, fix dry run ~28 ms. Corpus lint ~3 ms. Run `make benchmark` for local timings; CI runs weekly via `.github/workflows/benchmark.yml`.
+
 </div>
 
 ---
