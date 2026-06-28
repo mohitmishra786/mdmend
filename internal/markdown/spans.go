@@ -108,7 +108,6 @@ func (fs *FenceState) ProcessLine(line string, lineNum int) (inFence bool, isFen
 			fenceLen++
 		}
 		if fenceLen >= 3 {
-			isFenceLine = true
 			if !fs.InBlock {
 				fs.InBlock = true
 				fs.OpenLine = lineNum

@@ -66,10 +66,6 @@ type jsonRPCNotification struct {
 	Params  json.RawMessage `json:"params,omitempty"`
 }
 
-type initializeParams struct {
-	RootURI string `json:"rootUri"`
-}
-
 type textDocumentItem struct {
 	URI     string `json:"uri"`
 	LanguageID string `json:"languageId"`
@@ -203,7 +199,7 @@ func readLSPMessage(reader *bufio.Reader) ([]byte, error) {
 			break
 		}
 		if strings.HasPrefix(strings.ToLower(line), "content-length:") {
-			fmt.Sscanf(line, "Content-Length: %d", &contentLength)
+			_, _ = fmt.Sscanf(line, "Content-Length: %d", &contentLength)
 		}
 	}
 

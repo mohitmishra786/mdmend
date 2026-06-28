@@ -45,7 +45,7 @@ func runLintWatch(args []string, opts *lintOptions) error {
 	if err != nil {
 		return err
 	}
-	defer watcher.Close()
+	defer func() { _ = watcher.Close() }()
 
 	watchedDirs := make(map[string]struct{})
 	for _, file := range files {

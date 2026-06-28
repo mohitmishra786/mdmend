@@ -28,9 +28,15 @@ if command -v hyperfine >/dev/null 2>&1; then
     "$BIN fix $CORPUS --dry-run --quiet" \
     2>&1 | tee -a "$RESULTS"
 else
-  echo "hyperfine not installed; using time" | tee -a "$RESULTS"
-  /usr/bin/time -f "lint: %e sec" "$BIN" lint "$CORPUS" --quiet 2>&1 | tee -a "$RESULTS"
-  /usr/bin/time -f "fix dry-run: %e sec" "$BIN" fix "$CORPUS" --dry-run --quiet 2>&1 | tee -a "$RESULTS"
+  echo "hyperfine not installed; using shell timing" | tee -a "$RESULTS"
+  START=$(date +%s%N)
+  "$BIN" lint "$CORPUS" --quiet || true
+  END=$(date +%s%N)
+  echo "lint: $(( (END - START) / 1000000 )) ms" | tee -a "$RESULTS"
+  START=$(date +%s%N)
+  "$BIN" fix "$CORPUS" --dry-run --quiet || true
+  END=$(date +%s%N)
+  echo "fix dry-run: $(( (END - START) / 1000000 )) ms" | tee -a "$RESULTS"
 fi
 
 if command -v npx >/dev/null 2>&1; then

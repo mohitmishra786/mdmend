@@ -273,60 +273,10 @@ func ToYAML(cfg *Config) ([]byte, error) {
 	return yaml.Marshal(out)
 }
 
-func compactRuleConfig(rc RuleConfig) yamlRuleConfig {
-	return yamlRuleConfig{
-		TabSize:               rc.TabSize,
-		Punctuation:           rc.Punctuation,
-		Style:                 rc.Style,
-		SkipPatterns:          rc.SkipPatterns,
-		Fallback:              rc.Fallback,
-		Confidence:            rc.Confidence,
-		Names:                 rc.Names,
-		Indent:                rc.Indent,
-		LineLength:            rc.LineLength,
-		Enabled:               rc.Enabled,
-		Smart:                 rc.Smart,
-		AllowDifferentNesting: rc.AllowDifferentNesting,
-		Suggest:               rc.Suggest,
-		SuggestClosest:        rc.SuggestClosest,
-		PadShortRows:          rc.PadShortRows,
-		DeriveFromFilename:    rc.DeriveFromFilename,
-		PromoteFirst:          rc.PromoteFirst,
-		FrontMatter:           rc.FrontMatter,
-		AllowedTags:           rc.AllowedTags,
-		Headings:              rc.Headings,
-		CodeBlocks:            rc.CodeBlocks,
-		Tables:                rc.Tables,
-		Level:                 rc.Level,
-		SuggestDemotion:       rc.SuggestDemotion,
-	}
-}
+type yamlRuleConfig RuleConfig
 
-type yamlRuleConfig struct {
-	TabSize               int      `yaml:"tab_size,omitempty"`
-	Punctuation           string   `yaml:"punctuation,omitempty"`
-	Style                 string   `yaml:"style,omitempty"`
-	SkipPatterns          []string `yaml:"skip_patterns,omitempty"`
-	Fallback              string   `yaml:"fallback,omitempty"`
-	Confidence            float64  `yaml:"confidence,omitempty"`
-	Names                 []string `yaml:"names,omitempty"`
-	Indent                int      `yaml:"indent,omitempty"`
-	LineLength            int      `yaml:"line_length,omitempty"`
-	Enabled               *bool    `yaml:"enabled,omitempty"`
-	Smart                 *bool    `yaml:"smart,omitempty"`
-	AllowDifferentNesting *bool    `yaml:"allow_different_nesting,omitempty"`
-	Suggest               *bool    `yaml:"suggest,omitempty"`
-	SuggestClosest        *bool    `yaml:"suggest_closest,omitempty"`
-	PadShortRows          *bool    `yaml:"pad_short_rows,omitempty"`
-	DeriveFromFilename    *bool    `yaml:"derive_from_filename,omitempty"`
-	PromoteFirst          *bool    `yaml:"promote_first,omitempty"`
-	FrontMatter           *bool    `yaml:"front_matter,omitempty"`
-	AllowedTags           []string `yaml:"allowed_tags,omitempty"`
-	Headings              []string `yaml:"headings,omitempty"`
-	CodeBlocks            *bool    `yaml:"code_blocks,omitempty"`
-	Tables                *bool    `yaml:"tables,omitempty"`
-	Level                 int      `yaml:"level,omitempty"`
-	SuggestDemotion       *bool    `yaml:"suggest_demotion,omitempty"`
+func compactRuleConfig(rc RuleConfig) yamlRuleConfig {
+	return yamlRuleConfig(rc)
 }
 
 func ruleConfigIsEmpty(rc yamlRuleConfig) bool {
