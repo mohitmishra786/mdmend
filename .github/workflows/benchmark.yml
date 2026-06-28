@@ -132,7 +132,8 @@ jobs:
           git checkout --orphan gh-pages
           touch .nojekyll
           mkdir -p dev/bench
-          git add .nojekyll dev/bench
+          cp "${GITHUB_WORKSPACE}/scripts/gh-pages-index.html" index.html
+          git add .nojekyll index.html dev/bench
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Initialize gh-pages for benchmark dashboard"
@@ -153,3 +154,23 @@ jobs:
           gh-pages-branch: gh-pages
           fail-on-alert: false
           skip-fetch-gh-pages: false
+
+      - name: Ensure gh-pages root index
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          worktree="$(mktemp -d)"
+          git clone --depth 1 --branch gh-pages "$remote" "$worktree"
+          cp scripts/gh-pages-index.html "$worktree/index.html"
+          cd "$worktree"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --staged --quiet; then
+            echo "Root index.html already up to date"
+          else
+            git commit -m "pages: add root redirect to dev/bench"
+            git push origin gh-pages
+          fi
