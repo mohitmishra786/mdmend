@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mdmend benchmarks</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #00add8;
+      --mdmend: #00add8;
+      --rumdl: #dea584;
+      --pymarkdown: #7aa2f7;
+      --markdownlint: #e0af68;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
+    header { margin-bottom: 28px; }
+    h1 { margin: 0 0 8px; font-size: 1.75rem; font-weight: 700; }
+    .meta { color: var(--muted); font-size: 0.9rem; }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    select, button.toggle {
+      appearance: none;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+    button.toggle {
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: normal;
+      text-align: left;
+    }
+    button.toggle[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .panel h2 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+    }
+    .panel p.sub {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .chart-box { position: relative; height: 320px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+    tr:last-child td { border-bottom: none; }
+    .fastest { color: #3dd68c; font-weight: 600; }
+    .ratio { color: var(--muted); }
+    .empty {
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    footer {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    footer button {
+      background: var(--accent);
+      color: #001018;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>mdmend benchmark dashboard</h1>
+      <div class="meta">
+        <span id="last-update"></span>
+        ·
+        <a id="repository-link" rel="noopener"></a>
+      </div>
+    </header>
+
+    <div class="controls">
+      <label>
+        Platform
+        <select id="runner-select"></select>
+      </label>
+      <label>
+        Corpus
+        <select id="corpus-select"></select>
+      </label>
+      <label>
+        View
+        <select id="view-select">
+          <option value="compare">Compare tools</option>
+          <option value="history">Tool history</option>
+        </select>
+      </label>
+      <label id="tool-label" hidden>
+        Tool
+        <select id="tool-select"></select>
+      </label>
+      <label>
+        Scale
+        <button type="button" class="toggle" id="log-toggle" aria-pressed="false">Linear</button>
+      </label>
+    </div>
+
+    <div class="panel">
+      <h2 id="chart-title">Tool comparison</h2>
+      <p class="sub" id="chart-subtitle"></p>
+      <div class="chart-box"><canvas id="main-chart"></canvas></div>
+      <div class="empty" id="chart-empty" hidden>No data for this selection.</div>
+    </div>
+
+    <div class="panel" id="table-panel">
+      <h2>Results</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Mean</th>
+            <th>Std dev</th>
+            <th>vs mdmend lint</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+
+    <footer>
+      <button type="button" id="dl-button">Download JSON</button>
+      <span>Updated weekly by CI · <a href="https://github.com/mohitmishra786/mdmend/blob/main/docs/BENCHMARKS.md" rel="noopener">methodology</a></span>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script>
+    'use strict';
+
+    const RUNNER_ORDER = [
+      'linux-x64',
+      'linux-arm64',
+      'linux-22.04-x64',
+      'macos-arm64',
+      'windows-x64',
+    ];
+    const RUNNER_LABELS = {
+      'linux-x64': 'Ubuntu 24.04 (x64)',
+      'linux-arm64': 'Ubuntu 24.04 (ARM64)',
+      'linux-22.04-x64': 'Ubuntu 22.04 (x64)',
+      'macos-arm64': 'macOS (ARM64)',
+      'windows-x64': 'Windows (x64)',
+    };
+    const CORPUS_ORDER = ['small', 'medium', 'stress'];
+    const CORPUS_LABELS = {
+      small: 'Small (smoke corpus)',
+      medium: 'Medium (fixtures + corpus)',
+      stress: 'Stress (200 generated files)',
+    };
+    const TOOL_ORDER = [
+      'mdmend lint',
+      'rumdl check',
+      'mdmend fix',
+      'pymarkdown scan',
+      'markdownlint-cli2',
+    ];
+    const TOOL_COLORS = {
+      'mdmend lint': '#00add8',
+      'mdmend fix': '#4db8d8',
+      'rumdl check': '#dea584',
+      'pymarkdown scan': '#7aa2f7',
+      'markdownlint-cli2': '#e0af68',
+    };
+
+    function parseBenchName(name) {
+      const parts = name.split(' / ');
+      if (parts.length < 3) return null;
+      return {
+        runner: parts[0],
+        corpus: parts[1],
+        tool: parts.slice(2).join(' / '),
+      };
+    }
+
+    function buildIndex(data) {
+      const entries = [];
+      for (const suite of Object.values(data.entries)) {
+        for (const run of suite) {
+          for (const bench of run.benches) {
+            const parsed = parseBenchName(bench.name);
+            if (!parsed) continue;
+            entries.push({
+              ...parsed,
+              value: bench.value,
+              range: bench.range,
+              unit: bench.unit,
+              extra: bench.extra,
+              commit: run.commit,
+              date: run.date,
+            });
+          }
+        }
+      }
+      return entries;
+    }
+
+    function groupLatest(entries) {
+      const map = new Map();
+      for (const e of entries) {
+        const key = `${e.runner}|${e.corpus}|${e.tool}`;
+        const prev = map.get(key);
+        if (!prev || e.date > prev.date) map.set(key, e);
+      }
+      return map;
+    }
+
+    function historyFor(entries, runner, corpus, tool) {
+      return entries
+        .filter((e) => e.runner === runner && e.corpus === corpus && e.tool === tool)
+        .sort((a, b) => a.date - b.date);
+    }
+
+    const data = window.BENCHMARK_DATA;
+    const allEntries = buildIndex(data);
+    const latest = groupLatest(allEntries);
+
+    const runners = [...new Set(allEntries.map((e) => e.runner))].sort(
+      (a, b) => RUNNER_ORDER.indexOf(a) - RUNNER_ORDER.indexOf(b)
+    );
+    const corpora = [...new Set(allEntries.map((e) => e.corpus))].sort(
+      (a, b) => CORPUS_ORDER.indexOf(a) - CORPUS_ORDER.indexOf(b)
+    );
+
+    const runnerSelect = document.getElementById('runner-select');
+    const corpusSelect = document.getElementById('corpus-select');
+    const viewSelect = document.getElementById('view-select');
+    const toolSelect = document.getElementById('tool-select');
+    const toolLabel = document.getElementById('tool-label');
+    const logToggle = document.getElementById('log-toggle');
+    const chartTitle = document.getElementById('chart-title');
+    const chartSubtitle = document.getElementById('chart-subtitle');
+    const chartEmpty = document.getElementById('chart-empty');
+    const resultsBody = document.getElementById('results-body');
+    const tablePanel = document.getElementById('table-panel');
+
+    let chart = null;
+    let logScale = false;
+
+    function fillSelect(select, values, labels) {
+      select.replaceChildren();
+      for (const value of values) {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = labels[value] || value;
+        select.appendChild(opt);
+      }
+    }
+
+    fillSelect(runnerSelect, runners, RUNNER_LABELS);
+    fillSelect(corpusSelect, corpora, CORPUS_LABELS);
+    fillSelect(toolSelect, TOOL_ORDER, Object.fromEntries(TOOL_ORDER.map((t) => [t, t])));
+
+    document.getElementById('last-update').textContent =
+      'Last update: ' + new Date(data.lastUpdate).toLocaleString();
+    const repoLink = document.getElementById('repository-link');
+    repoLink.href = data.repoUrl;
+    repoLink.textContent = data.repoUrl.replace('https://github.com/', '');
+
+    document.getElementById('dl-button').onclick = () => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'benchmark_data.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    function selectedComparison() {
+      const runner = runnerSelect.value;
+      const corpus = corpusSelect.value;
+      return TOOL_ORDER.map((tool) => latest.get(`${runner}|${corpus}|${tool}`)).filter(Boolean);
+    }
+
+    function formatMs(value, unit) {
+      if (value >= 1000) return (value / 1000).toFixed(2) + ' s';
+      return value.toFixed(2) + ' ' + (unit || 'ms');
+    }
+
+    function destroyChart() {
+      if (chart) {
+        chart.destroy();
+        chart = null;
+      }
+    }
+
+    function renderCompare() {
+      const runner = runnerSelect.value;
+      const corpus = corpusSelect.value;
+      const rows = selectedComparison();
+      tablePanel.hidden = false;
+
+      if (rows.length === 0) {
+        destroyChart();
+        chartEmpty.hidden = false;
+        resultsBody.replaceChildren();
+        return;
+      }
+      chartEmpty.hidden = true;
+
+      const baseline = rows.find((r) => r.tool === 'mdmend lint');
+      const sorted = [...rows].sort((a, b) => a.value - b.value);
+
+      chartTitle.textContent = 'Tool comparison';
+      chartSubtitle.textContent =
+        (RUNNER_LABELS[runner] || runner) + ' · ' + (CORPUS_LABELS[corpus] || corpus);
+
+      destroyChart();
+      const ctx = document.getElementById('main-chart').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: sorted.map((r) => r.tool),
+          datasets: [{
+            label: 'Mean time',
+            data: sorted.map((r) => r.value),
+            backgroundColor: sorted.map((r) => (TOOL_COLORS[r.tool] || '#888') + 'cc'),
+            borderColor: sorted.map((r) => TOOL_COLORS[r.tool] || '#888'),
+            borderWidth: 1,
+          }],
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (item) => {
+                  const row = sorted[item.dataIndex];
+                  let text = formatMs(row.value, row.unit);
+                  if (row.range) text += ' (±' + row.range + ')';
+                  return text;
+                },
+              },
+            },
+          },
+          scales: {
+            x: {
+              type: logScale ? 'logarithmic' : 'linear',
+              title: { display: true, text: 'Time (ms)', color: '#8b9cb3' },
+              ticks: { color: '#8b9cb3' },
+              grid: { color: '#2d3a4f' },
+            },
+            y: {
+              ticks: { color: '#e7ecf3' },
+              grid: { display: false },
+            },
+          },
+        },
+      });
+
+      resultsBody.replaceChildren();
+      for (const row of sorted) {
+        const tr = document.createElement('tr');
+        const ratio = baseline && row.tool !== 'mdmend lint'
+          ? (row.value / baseline.value).toFixed(1) + '×'
+          : row.tool === 'mdmend lint' ? '1.0× (baseline)' : '—';
+        const meanClass = row === sorted[0] ? 'fastest' : '';
+        tr.innerHTML =
+          '<td>' + row.tool + '</td>' +
+          '<td class="' + meanClass + '">' + formatMs(row.value, row.unit) + '</td>' +
+          '<td>±' + (row.range || '0') + '</td>' +
+          '<td class="ratio">' + ratio + '</td>';
+        resultsBody.appendChild(tr);
+      }
+    }
+
+    function renderHistory() {
+      const runner = runnerSelect.value;
+      const corpus = corpusSelect.value;
+      const tool = toolSelect.value;
+      const points = historyFor(allEntries, runner, corpus, tool);
+
+      chartTitle.textContent = 'History: ' + tool;
+      chartSubtitle.textContent =
+        (RUNNER_LABELS[runner] || runner) + ' · ' + (CORPUS_LABELS[corpus] || corpus);
+
+      tablePanel.hidden = true;
+
+      if (points.length === 0) {
+        destroyChart();
+        chartEmpty.hidden = false;
+        chartEmpty.textContent = 'No data for this selection.';
+        return;
+      }
+
+      chartEmpty.hidden = true;
+      destroyChart();
+      const ctx = document.getElementById('main-chart').getContext('2d');
+      const color = TOOL_COLORS[tool] || '#00add8';
+
+      chart = new Chart(ctx, {
+        type: points.length === 1 ? 'bar' : 'line',
+        data: {
+          labels: points.map((p) => p.commit.id.slice(0, 7)),
+          datasets: [{
+            label: tool,
+            data: points.map((p) => p.value),
+            backgroundColor: color + '99',
+            borderColor: color,
+            borderWidth: 2,
+            fill: points.length > 1,
+            tension: 0.2,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                afterTitle: (items) => {
+                  const p = points[items[0].dataIndex];
+                  return p.commit.message + '\n' + p.commit.timestamp;
+                },
+                label: (item) => formatMs(points[item.dataIndex].value, points[item.dataIndex].unit),
+              },
+            },
+          },
+          scales: {
+            x: {
+              title: { display: true, text: 'Commit', color: '#8b9cb3' },
+              ticks: { color: '#8b9cb3' },
+              grid: { color: '#2d3a4f' },
+            },
+            y: {
+              type: logScale ? 'logarithmic' : 'linear',
+              title: { display: true, text: 'Time (ms)', color: '#8b9cb3' },
+              ticks: { color: '#8b9cb3' },
+              grid: { color: '#2d3a4f' },
+              beginAtZero: !logScale,
+            },
+          },
+          onClick: (_evt, elems) => {
+            if (elems.length > 0) {
+              window.open(points[elems[0].index].commit.url, '_blank');
+            }
+          },
+        },
+      });
+
+      if (points.length === 1) {
+        chartSubtitle.textContent += ' · Single run so far — trends appear after more weekly runs';
+      }
+    }
+
+    function render() {
+      const view = viewSelect.value;
+      toolLabel.hidden = view !== 'history';
+      if (view === 'history') {
+        renderHistory();
+      } else {
+        renderCompare();
+      }
+    }
+
+    runnerSelect.onchange = render;
+    corpusSelect.onchange = render;
+    viewSelect.onchange = render;
+    toolSelect.onchange = render;
+    logToggle.onclick = () => {
+      logScale = !logScale;
+      logToggle.textContent = logScale ? 'Logarithmic' : 'Linear';
+      logToggle.setAttribute('aria-pressed', String(logScale));
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>
