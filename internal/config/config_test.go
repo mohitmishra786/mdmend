@@ -229,6 +229,79 @@ func TestLoadJSON(t *testing.T) {
 	if cfg == nil {
 		t.Fatal("Load() returned nil config")
 	}
+
+	if !cfg.IsDisabled("MD013") {
+		t.Error("MD013 should be disabled from JSON config")
+	}
+
+	if cfg.TabSize != 2 {
+		t.Errorf("TabSize = %d, want 2", cfg.TabSize)
+	}
+}
+
+func TestParseMarkdownlintNativeFormat(t *testing.T) {
+	content := `{
+		"default": true,
+		"MD013": false,
+		"MD003": { "style": "atx" },
+		"MD029": { "style": "ordered" }
+	}`
+
+	cfg, err := ParseMarkdownlintJSON([]byte(content))
+	if err != nil {
+		t.Fatalf("ParseMarkdownlintJSON() error = %v", err)
+	}
+
+	if !cfg.IsDisabled("MD013") {
+		t.Error("MD013 should be disabled")
+	}
+
+	if rc := cfg.GetRuleConfig("MD003"); rc.Style != "atx" {
+		t.Errorf("MD003 style = %q, want atx", rc.Style)
+	}
+
+	if rc := cfg.GetRuleConfig("MD029"); rc.Style != "ordered" {
+		t.Errorf("MD029 style = %q, want ordered", rc.Style)
+	}
+}
+
+func TestApplyFlavorMDX(t *testing.T) {
+	cfg := Default()
+	cfg.Flavor = FlavorMDX
+
+	applied := ApplyFlavor(cfg, "docs/page.mdx")
+	if !applied.IsDisabled("MD033") {
+		t.Error("MD033 should be disabled for mdx flavor")
+	}
+}
+
+func TestApplyFlavorMkDocs(t *testing.T) {
+	cfg := Default()
+	cfg.Flavor = FlavorMkDocs
+
+	applied := ApplyFlavor(cfg, "docs/index.md")
+	found := false
+	for _, pattern := range applied.Ignore {
+		if pattern == "site/" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("mkdocs flavor should add site/ to ignore patterns")
+	}
+}
+
+func TestPerFileFlavor(t *testing.T) {
+	cfg := Default()
+	cfg.PerFileFlavor = map[string]string{
+		"*.mdx": FlavorMDX,
+	}
+
+	flavor := ResolveFlavor(cfg, "components/Button.mdx")
+	if flavor != FlavorMDX {
+		t.Errorf("ResolveFlavor() = %q, want %q", flavor, FlavorMDX)
+	}
 }
 
 func TestLoadIgnorePatterns(t *testing.T) {

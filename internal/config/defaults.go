@@ -1,12 +1,14 @@
 package config
 
 type Config struct {
-	Disable    []string              `yaml:"disable"`
-	Only       []string              `yaml:"only"`
-	Rules      map[string]RuleConfig `yaml:"rules"`
-	Ignore     []string              `yaml:"ignore"`
-	TabSize    int                   `yaml:"tab_size"`
-	Aggressive bool                  `yaml:"aggressive"`
+	Disable       []string              `yaml:"disable"`
+	Only          []string              `yaml:"only"`
+	Rules         map[string]RuleConfig `yaml:"rules"`
+	Ignore        []string              `yaml:"ignore"`
+	TabSize       int                   `yaml:"tab_size"`
+	Aggressive    bool                  `yaml:"aggressive"`
+	Flavor        string                `yaml:"flavor"`
+	PerFileFlavor map[string]string     `yaml:"per_file_flavor"`
 }
 
 type RuleConfig struct {

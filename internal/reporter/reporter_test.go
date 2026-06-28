@@ -2,6 +2,7 @@ package reporter
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/mohitmishra786/mdmend/internal/rules"
@@ -292,6 +293,36 @@ func TestConsoleReporterReportUnfixable(t *testing.T) {
 
 	if buf.Len() == 0 {
 		t.Error("Report() should write output")
+	}
+}
+
+func TestSARIFReporterOutputResults(t *testing.T) {
+	var buf bytes.Buffer
+	sr := NewSARIFReporterWithWriter(&buf, "1.2.0")
+
+	results := []JSONFileResult{
+		{
+			Path: "test.md",
+			Violations: []JSONViolation{
+				{Rule: "MD010", Line: 1, Column: 1, Message: "Hard tab", Fixable: true},
+			},
+		},
+	}
+
+	if err := sr.OutputResults(results, JSONSummary{TotalFiles: 1, TotalViolations: 1}); err != nil {
+		t.Fatalf("OutputResults() error = %v", err)
+	}
+
+	if buf.Len() == 0 {
+		t.Fatal("SARIF output should not be empty")
+	}
+
+	output := buf.String()
+	if !strings.Contains(output, `"version": "2.1.0"`) {
+		t.Error("SARIF output should include version 2.1.0")
+	}
+	if !strings.Contains(output, `"ruleId": "MD010"`) {
+		t.Error("SARIF output should include rule results")
 	}
 }
 

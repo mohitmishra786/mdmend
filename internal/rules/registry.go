@@ -76,6 +76,7 @@ const (
 
 func RulesByPhase(phase Phase) []Rule {
 	phaseMap := map[string]Phase{
+		"MD001": PhaseStructure,
 		"MD003": PhaseStructure,
 		"MD004": PhaseStructure,
 		"MD005": PhaseStructure,
@@ -85,6 +86,7 @@ func RulesByPhase(phase Phase) []Rule {
 		"MD012": PhaseStructure,
 		"MD022": PhaseStructure,
 		"MD028": PhaseStructure,
+		"MD029": PhaseStructure,
 		"MD031": PhaseStructure,
 		"MD032": PhaseStructure,
 		"MD041": PhaseStructure,

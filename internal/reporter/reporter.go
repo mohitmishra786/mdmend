@@ -12,5 +12,6 @@ type Format string
 const (
 	FormatConsole Format = "console"
 	FormatJSON    Format = "json"
+	FormatSARIF   Format = "sarif"
 	FormatDiff    Format = "diff"
 )
