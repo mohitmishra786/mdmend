@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/mohitmishra786/mdmend/internal/cache"
 	"github.com/mohitmishra786/mdmend/internal/config"
 	"github.com/mohitmishra786/mdmend/internal/fixer"
 	"github.com/mohitmishra786/mdmend/internal/linter"
@@ -41,6 +42,9 @@ type globalOptions struct {
 	maxViolations int
 	stats         bool
 	only          string
+	flavor        string
+	noCache       bool
+	watch         bool
 }
 
 type fixOptions struct {
@@ -99,7 +103,9 @@ func init() {
 	rootCmd.SetVersionTemplate(fmt.Sprintf("mdmend %s (commit: %s, built: %s)\n", version, commit, date))
 
 	rootCmd.PersistentFlags().StringVarP(&globalOpts.config, "config", "c", "", "Path to config file (default: .mdmend.yml)")
-	rootCmd.PersistentFlags().StringVarP(&globalOpts.output, "output", "o", "console", "Output format: console|json")
+	rootCmd.PersistentFlags().StringVarP(&globalOpts.output, "output", "o", "console", "Output format: console|json|sarif")
+	rootCmd.PersistentFlags().StringVar(&globalOpts.flavor, "flavor", "", "Markdown flavor: standard|mdx|mkdocs")
+	rootCmd.PersistentFlags().BoolVar(&globalOpts.noCache, "no-cache", false, "Disable file hash cache")
 	rootCmd.PersistentFlags().BoolVar(&globalOpts.noColor, "no-color", false, "Disable color output")
 	rootCmd.PersistentFlags().StringArrayVar(&globalOpts.ignore, "ignore", []string{}, "Glob pattern to ignore (repeatable, e.g. --ignore vendor/)")
 	rootCmd.PersistentFlags().StringVar(&globalOpts.rules, "rules", "", "Enable/disable rules (comma-separated, prefix ~ to disable, e.g. MD040,~MD034)")
@@ -114,11 +120,50 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&globalOpts.stats, "stats", false, "Print per-rule violation frequency table after summary")
 	rootCmd.PersistentFlags().StringVar(&globalOpts.only, "only", "", "Run only the given rules (comma-separated, e.g. MD040,MD034)")
 
+	rootCmd.AddCommand(newCheckCmd())
 	rootCmd.AddCommand(newFixCmd())
 	rootCmd.AddCommand(newLintCmd())
 	rootCmd.AddCommand(newSuggestCmd())
+	rootCmd.AddCommand(newInitCmd())
+	rootCmd.AddCommand(newServerCmd())
+	rootCmd.AddCommand(newCacheCmd())
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(newRulesCmd())
+}
+
+func newCheckCmd() *cobra.Command {
+	fixOpts := &fixOptions{}
+	lintOpts := &lintOptions{}
+	var doFix bool
+
+	cmd := &cobra.Command{
+		Use:   "check [paths...]",
+		Short: "Lint or fix Markdown (alias for lint/fix)",
+		Long: `Check Markdown files for lint violations, or fix them with --fix.
+
+This command mirrors industry conventions (rumdl check, golangci-lint run):
+  mdmend check .           Same as mdmend lint .
+  mdmend check . --fix     Same as mdmend fix .
+  mdmend check . --fix --diff`,
+		Args: cobra.MinimumNArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if doFix {
+				fixOpts.globalOptions = globalOpts
+				return runFix(args, fixOpts)
+			}
+			lintOpts.globalOptions = globalOpts
+			return runLint(args, lintOpts)
+		},
+	}
+
+	cmd.Flags().BoolVar(&doFix, "fix", false, "Apply auto-fixes instead of linting")
+	cmd.Flags().BoolVarP(&fixOpts.dryRun, "dry-run", "n", false, "Preview fixes without writing files")
+	cmd.Flags().BoolVarP(&fixOpts.diff, "diff", "d", false, "Output unified diffs when fixing")
+	cmd.Flags().BoolVar(&fixOpts.aggressive, "aggressive", false, "Apply heuristic fixes (MD040/MD034)")
+	cmd.Flags().IntVar(&fixOpts.workers, "workers", runtime.NumCPU(), "Number of parallel workers when fixing")
+	cmd.Flags().BoolVar(&lintOpts.watch, "watch", false, "Watch files and re-lint on changes")
+
+	return cmd
 }
 
 func newFixCmd() *cobra.Command {
@@ -194,6 +239,8 @@ Examples:
 			return runLint(args, opts)
 		},
 	}
+
+	cmd.Flags().BoolVar(&opts.watch, "watch", false, "Watch files and re-lint on changes")
 
 	return cmd
 }
@@ -625,6 +672,10 @@ func runLint(args []string, opts *lintOptions) error {
 		return err
 	}
 
+	if opts.watch {
+		return runLintWatch(args, opts)
+	}
+
 	ignore := append(cfg.Ignore, opts.ignore...)
 	w := walker.New(ignore)
 
@@ -647,11 +698,14 @@ func runLint(args []string, opts *lintOptions) error {
 		fmt.Println()
 	}
 
-	if opts.output == "json" {
+	switch opts.output {
+	case "json":
 		return runLintJSON(files, cfg, opts)
+	case "sarif":
+		return runLintSARIF(files, cfg, opts)
+	default:
+		return runLintConsole(files, cfg, opts)
 	}
-
-	return runLintConsole(files, cfg, opts)
 }
 
 func runLintConsole(files []string, cfg *config.Config, opts *lintOptions) error {
@@ -660,7 +714,11 @@ func runLintConsole(files []string, cfg *config.Config, opts *lintOptions) error
 		cr.PrintHeader(version, len(files), 1)
 	}
 
-	l := linter.New(cfg)
+	var lintCache *cache.Cache
+	if !opts.noCache {
+		lintCache, _ = cache.Load("")
+	}
+
 	totalViolations := 0
 	filesWithIssues := 0
 	ruleStats := make(map[string]int)
@@ -674,8 +732,24 @@ func runLintConsole(files []string, cfg *config.Config, opts *lintOptions) error
 			continue
 		}
 
+		if lintCache != nil && lintCache.IsFresh(path, content) {
+			if count, ok := lintCache.Violations(path); ok {
+				if count > 0 {
+					filesWithIssues++
+					totalViolations += count
+				}
+			}
+			continue
+		}
+
+		fileCfg := config.ApplyFlavor(cfg, path)
+		l := linter.New(fileCfg)
 		result := l.Lint(string(content), path)
 		filtered := applyOnlyFilter(result.Violations, opts.only)
+
+		if lintCache != nil {
+			_ = lintCache.Update(path, content, len(filtered))
+		}
 
 		if len(filtered) > 0 {
 			if !opts.quiet {
@@ -716,26 +790,14 @@ func runLintConsole(files []string, cfg *config.Config, opts *lintOptions) error
 		printRuleStats(ruleStats, opts.noColor)
 	}
 
-	if opts.exitZero {
-		return nil
+	if lintCache != nil {
+		_ = lintCache.Save()
 	}
 
-	if opts.maxViolations > 0 {
-		if totalViolations > opts.maxViolations {
-			os.Exit(1)
-		}
-		return nil
-	}
-
-	if totalViolations > 0 {
-		os.Exit(1)
-	}
-
-	return nil
+	return exitForViolations(totalViolations, opts)
 }
 
 func runLintJSON(files []string, cfg *config.Config, opts *lintOptions) error {
-	l := linter.New(cfg)
 	jr := reporter.NewJSONReporter()
 
 	var results []reporter.JSONFileResult
@@ -753,6 +815,8 @@ func runLintJSON(files []string, cfg *config.Config, opts *lintOptions) error {
 			continue
 		}
 
+		fileCfg := config.ApplyFlavor(cfg, path)
+		l := linter.New(fileCfg)
 		result := l.Lint(string(content), path)
 		violations := reporter.ConvertViolations(result.Violations)
 		violations = applyOnlyFilterJSON(violations, opts.only)
@@ -784,6 +848,64 @@ func runLintJSON(files []string, cfg *config.Config, opts *lintOptions) error {
 		return err
 	}
 
+	return exitForViolations(totalViolations, opts)
+}
+
+func runLintSARIF(files []string, cfg *config.Config, opts *lintOptions) error {
+	sr := reporter.NewSARIFReporter(version)
+
+	var results []reporter.JSONFileResult
+	totalViolations := 0
+	filesWithIssues := 0
+	fixable := 0
+
+	for _, path := range files {
+		content, err := os.ReadFile(path)
+		if err != nil {
+			results = append(results, reporter.JSONFileResult{
+				Path:  path,
+				Error: err.Error(),
+			})
+			continue
+		}
+
+		fileCfg := config.ApplyFlavor(cfg, path)
+		l := linter.New(fileCfg)
+		result := l.Lint(string(content), path)
+		violations := reporter.ConvertViolations(result.Violations)
+		violations = applyOnlyFilterJSON(violations, opts.only)
+
+		results = append(results, reporter.JSONFileResult{
+			Path:       path,
+			Violations: violations,
+		})
+
+		if len(violations) > 0 {
+			filesWithIssues++
+			totalViolations += len(violations)
+		}
+		for _, v := range violations {
+			if v.Fixable {
+				fixable++
+			}
+		}
+	}
+
+	err := sr.OutputResults(results, reporter.JSONSummary{
+		TotalFiles:      len(files),
+		FilesWithIssues: filesWithIssues,
+		TotalViolations: totalViolations,
+		Fixable:         fixable,
+		Unfixable:       totalViolations - fixable,
+	})
+	if err != nil {
+		return err
+	}
+
+	return exitForViolations(totalViolations, opts)
+}
+
+func exitForViolations(totalViolations int, opts *lintOptions) error {
 	if opts.exitZero {
 		return nil
 	}
@@ -868,6 +990,13 @@ func loadConfig(opts globalOptions) (*config.Config, error) {
 	cfg, err := config.Load(opts.config)
 	if err != nil {
 		return nil, err
+	}
+
+	if opts.flavor != "" {
+		if !config.ValidFlavor(opts.flavor) {
+			return nil, fmt.Errorf("invalid flavor %q: use standard, mdx, or mkdocs", opts.flavor)
+		}
+		cfg.Flavor = config.NormalizeFlavor(opts.flavor)
 	}
 
 	if opts.tabSize > 0 {

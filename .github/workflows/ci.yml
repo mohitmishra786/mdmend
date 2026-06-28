@@ -26,6 +26,9 @@ jobs:
       
       - name: Run tests
         run: go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Integration corpus tests
+        run: go test -v -run 'TestCorpus|TestGolden|TestRoundTrip' ./internal/fixer/...
       
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -85,4 +88,21 @@ jobs:
         run: go build -o mdmend ./cmd/mdmend
       
       - name: Lint README
-        run: ./mdmend lint README.md --rules ~MD013,~MD033,~MD024,~MD041 || true
+        run: ./mdmend check README.md --rules ~MD013,~MD033,~MD024,~MD041 || true
+
+      - name: Verify clean corpus round-trip
+        run: go test -run TestCorpusCleanRoundTrip ./internal/fixer/...
+
+  action-smoke:
+    name: Action Smoke Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Build for action smoke
+        run: go build -o /usr/local/bin/mdmend ./cmd/mdmend
+      - name: Run composite action args
+        run: mdmend check testdata/corpus/ --quiet
