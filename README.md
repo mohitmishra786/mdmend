@@ -14,7 +14,7 @@ Fast, zero-dependency Markdown linter and fixer. 57 rules. 40 auto-fixable.
 
 Single static binary. No Node or Python runtime required.
 
-**Performance** (stress corpus: 200 files / 1.38 MB): lint **~7 ms** — 3.7× faster than [rumdl](https://github.com/rvben/rumdl), 215× faster than markdownlint-cli2, 1,600× faster than pymarkdown. See [docs/BENCHMARKS.md](docs/BENCHMARKS.md). Run `make benchmark` locally; CI runs weekly.
+**Performance:** lint **~7 ms** on a 200-file stress corpus — fastest among tested linters. See [Benchmarks](#benchmarks).
 
 </div>
 
@@ -417,6 +417,51 @@ A minimal extension lives in [`editors/vscode/`](editors/vscode/). It runs `mdme
 mdmend server
 ```
 
+## Benchmarks
+
+mdmend is benchmarked against other Markdown linters using [hyperfine](https://github.com/sharkdp/hyperfine) across multiple corpora. Reproduce locally with `make benchmark` or read the full methodology in [docs/BENCHMARKS.md](docs/BENCHMARKS.md). CI runs the suite weekly and uploads artifacts.
+
+### Stress corpus (200 files, ~1.38 MB)
+
+Measured on Apple Silicon macOS (June 2026). Competitors run their default lint commands; timings measure throughput, not identical rule coverage.
+
+| Tool | Command | Mean time | vs mdmend lint |
+|------|---------|-----------|----------------|
+| **mdmend** | `mdmend lint` | **6.7 ms** | 1.0× (baseline) |
+| [rumdl](https://github.com/rvben/rumdl) | `rumdl check` | 25.1 ms | 3.7× slower |
+| mdmend | `mdmend fix --dry-run` | 317 ms | 47× slower |
+| [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) | `markdownlint-cli2 **/*.md` | 1.45 s | 215× slower |
+| [pymarkdown](https://github.com/jackdewinter/pymarkdown) | `pymarkdown scan` | 10.8 s | 1,602× slower |
+
+### Medium corpus (237 files, ~1.38 MB)
+
+| Tool | Mean time |
+|------|-----------|
+| mdmend lint | 7.6 ms |
+| mdmend fix --dry-run | 377 ms |
+| markdownlint-cli2 | 623 ms |
+
+### Why mdmend is fast
+
+- Single static Go binary — no Node, Python, or Rust runtime startup per invocation
+- Parallel file processing with a worker pool (`--workers`)
+- Phase-ordered rule execution avoids redundant passes
+- File-hash cache skips unchanged files on repeat runs (`--no-cache` to disable)
+
+### Roadmap (performance)
+
+| Priority | Plan | Expected impact |
+|----------|------|-----------------|
+| High | Incremental lint via `--watch` + cache warming | Near-zero cost on single-file edits in large repos |
+| High | SIMD / batch line scanning for hot rules (MD009, MD010, MD013) | Lower per-byte cost on megabyte-scale files |
+| Medium | Rule-level short-circuit when a file has no matching constructs | Skip MD056 on files with no tables, etc. |
+| Medium | Publish multi-platform CI benchmark dashboard (Linux/macOS/Windows) | Reproducible cross-OS comparison tables in README |
+| Medium | Memory profiling on stress corpus; cap allocations in fix pipeline | Stable performance under 10k+ file monorepos |
+| Low | Optional `mdmend lint --profile` flag for per-rule timing | Helps contributors optimize the slowest rules |
+| Low | Compare fix throughput with rumdl `--fix` when parity rules align | Apples-to-apples auto-fix benchmarking |
+
+Contributions welcome on any item above — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Tech Stack
 
 | Component | Technology | Purpose |
@@ -440,6 +485,7 @@ The tool is intentionally minimal. No framework, no runtime dependencies, just s
 - [docs/MIGRATION.md](docs/MIGRATION.md) — Migrating from markdownlint
 - [docs/ENTERPRISE.md](docs/ENTERPRISE.md) — Org deployment patterns
 - [docs/RULE_AUDIT.md](docs/RULE_AUDIT.md) — Rule coverage audit
+- [docs/BENCHMARKS.md](docs/BENCHMARKS.md) — Benchmark methodology and results
 - [editors/vscode/README.md](editors/vscode/README.md) — VS Code extension
 
 ## License
