@@ -1,4 +1,4 @@
-.PHONY: build test lint clean install release
+.PHONY: build test lint clean install release benchmark
 
 BINARY_NAME=mdmend
 MAIN_PATH=./cmd/mdmend
@@ -56,6 +56,9 @@ deps:
 	go mod download
 	go mod tidy
 
+benchmark:
+	./scripts/benchmark.sh
+
 help:
 	@echo "Available targets:"
 	@echo "  build          - Build the binary"
@@ -72,3 +75,4 @@ help:
 	@echo "  run            - Build and run on current directory"
 	@echo "  self-lint      - Run mdmend on itself"
 	@echo "  deps           - Download and tidy dependencies"
+	@echo "  benchmark      - Run lint/fix performance benchmarks"
