@@ -145,6 +145,7 @@ scoops:
       name: scoop-bucket
       branch: main
       token: "{{ .Env.SCOOP_GITHUB_TOKEN }}"
+    directory: bucket
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
