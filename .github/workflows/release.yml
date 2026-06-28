@@ -1,11 +1,14 @@
 name: Release
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag version (e.g., v1.0.0)'
-        required: true
+        description: 'Tag version (e.g., v1.0.0) — only used when dispatching manually without an existing tag'
+        required: false
         type: string
 
 permissions:
@@ -26,12 +29,13 @@ jobs:
           go-version: '1.22'
       
       - name: Create and push tag
+        if: github.event_name == 'workflow_dispatch' && inputs.tag != ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag ${{ inputs.tag }}
           git push origin ${{ inputs.tag }}
-      
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
