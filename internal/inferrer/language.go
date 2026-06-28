@@ -34,7 +34,7 @@ var patterns = []patternMatcher{
 	{"css", regexp.MustCompile(`(?m)^\.[a-zA-Z][\w-]*\s*\{|^#[a-zA-Z][\w-]*\s*\{`)},
 	{"diff", regexp.MustCompile(`(?m)^(\+\+\+|---|@@\s)`)},
 	{"ini", regexp.MustCompile(`(?m)^\[[A-Za-z\s]+\]\s*$`)},
-	{"makefile", regexp.MustCompile(`(?m)^[a-zA-Z_.-]+:\s+[^\s#=]|^\.PHONY`)},
+	{"makefile", regexp.MustCompile(`(?m)^[a-zA-Z_.-]+:[ \t]+[^\s#=]|^\.PHONY`)},
 	{"sh", regexp.MustCompile(`(?m)^#!/.*/(bash|sh|zsh)`)},
 	{"ruby", regexp.MustCompile(`(?m)^(require|class|def |module |end$)`)},
 	{"c", regexp.MustCompile(`(?m)^(#include|#define|int |void |char )`)},
@@ -152,9 +152,10 @@ func inferFromContent(content []string) InferResult {
 
 	maxLang := ""
 	maxCount := 0
-	for lang, count := range matchCounts {
+	for _, pm := range patterns {
+		count := matchCounts[pm.lang]
 		if count > maxCount {
-			maxLang = lang
+			maxLang = pm.lang
 			maxCount = count
 		}
 	}
