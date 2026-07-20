@@ -41,7 +41,7 @@ jobs:
           echo "value=${version}" >> "$GITHUB_OUTPUT"
           echo "Target version: v${version}"
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
           registry-url: https://registry.npmjs.org
