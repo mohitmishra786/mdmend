@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785133748998,
+  "lastUpdate": 1785738070537,
   "repoUrl": "https://github.com/mohitmishra786/mdmend",
   "entries": {
     "mdmend lint benchmarks": [
@@ -5373,6 +5373,553 @@ window.BENCHMARK_DATA = {
             "range": "8.17",
             "unit": "ms",
             "extra": "{\"min_ms\": 302.02, \"max_ms\": 318.11, \"command\": \"pymarkdown scan /d/a/mdmend/mdmend/testdata/benchmark/stress\"}"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "github-actions[bot]",
+            "username": "github-actions[bot]",
+            "email": "41898282+github-actions[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "github-actions[bot]",
+            "username": "github-actions[bot]",
+            "email": "41898282+github-actions[bot]@users.noreply.github.com"
+          },
+          "id": "16e5f7d15d388feafee696f25bd6e31e81dc5701",
+          "message": "bench: weekly results 2026-07-27",
+          "timestamp": "2026-07-27T06:29:05Z",
+          "url": "https://github.com/mohitmishra786/mdmend/commit/16e5f7d15d388feafee696f25bd6e31e81dc5701"
+        },
+        "date": 1785738070094,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "linux-22.04-x64 / medium / mdmend lint",
+            "value": 4.73,
+            "range": "0.11",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 4.65, \"max_ms\": 4.86, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / medium / mdmend fix",
+            "value": 8.76,
+            "range": "0.4",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 8.44, \"max_ms\": 9.21, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / medium / markdownlint-cli2",
+            "value": 794.99,
+            "range": "2.11",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 793.06, \"max_ms\": 797.24, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/**/*.md\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / medium / rumdl check",
+            "value": 13.46,
+            "range": "0.08",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 13.38, \"max_ms\": 13.55, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / medium / pymarkdown scan",
+            "value": 237.58,
+            "range": "3.87",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 234.0, \"max_ms\": 241.69, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / small / mdmend lint",
+            "value": 3.56,
+            "range": "0.09",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.51, \"max_ms\": 3.67, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata/corpus --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / small / mdmend fix",
+            "value": 3.92,
+            "range": "0.21",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.75, \"max_ms\": 4.15, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata/corpus --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / small / markdownlint-cli2",
+            "value": 735.72,
+            "range": "12.24",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 724.36, \"max_ms\": 748.68, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/corpus/**/*.md\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / small / rumdl check",
+            "value": 9.89,
+            "range": "0.19",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 9.67, \"max_ms\": 10.05, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / small / pymarkdown scan",
+            "value": 252.98,
+            "range": "1.35",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 251.65, \"max_ms\": 254.35, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / stress / mdmend lint",
+            "value": 3.7,
+            "range": "0.15",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.57, \"max_ms\": 3.86, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata/benchmark/stress --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / stress / mdmend fix",
+            "value": 3.51,
+            "range": "0.11",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.39, \"max_ms\": 3.61, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata/benchmark/stress --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / stress / markdownlint-cli2",
+            "value": 718.77,
+            "range": "6.07",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 711.83, \"max_ms\": 723.14, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/benchmark/stress/**/*.md\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / stress / rumdl check",
+            "value": 6.26,
+            "range": "0.19",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 6.07, \"max_ms\": 6.45, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "linux-22.04-x64 / stress / pymarkdown scan",
+            "value": 238.47,
+            "range": "1.66",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 236.81, \"max_ms\": 240.13, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "linux-arm64 / medium / mdmend lint",
+            "value": 3.28,
+            "range": "0.21",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.08, \"max_ms\": 3.5, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-arm64 / medium / mdmend fix",
+            "value": 7.14,
+            "range": "0.24",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 6.86, \"max_ms\": 7.3, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-arm64 / medium / markdownlint-cli2",
+            "value": 694.16,
+            "range": "4.96",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 688.47, \"max_ms\": 697.55, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/**/*.md\"}"
+          },
+          {
+            "name": "linux-arm64 / medium / rumdl check",
+            "value": 9.35,
+            "range": "0.13",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 9.2, \"max_ms\": 9.46, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "linux-arm64 / medium / pymarkdown scan",
+            "value": 188.44,
+            "range": "1.45",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 186.97, \"max_ms\": 189.88, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "linux-arm64 / small / mdmend lint",
+            "value": 3.01,
+            "range": "0.14",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 2.86, \"max_ms\": 3.15, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata/corpus --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-arm64 / small / mdmend fix",
+            "value": 3.37,
+            "range": "0.08",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.31, \"max_ms\": 3.46, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata/corpus --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-arm64 / small / markdownlint-cli2",
+            "value": 641.76,
+            "range": "12.23",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 631.43, \"max_ms\": 655.26, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/corpus/**/*.md\"}"
+          },
+          {
+            "name": "linux-arm64 / small / rumdl check",
+            "value": 7.62,
+            "range": "0.58",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 7.28, \"max_ms\": 8.28, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "linux-arm64 / small / pymarkdown scan",
+            "value": 199.78,
+            "range": "1.79",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 198.68, \"max_ms\": 201.84, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "linux-arm64 / stress / mdmend lint",
+            "value": 3.05,
+            "range": "0.04",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.01, \"max_ms\": 3.1, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata/benchmark/stress --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-arm64 / stress / mdmend fix",
+            "value": 2.96,
+            "range": "0.07",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 2.9, \"max_ms\": 3.03, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata/benchmark/stress --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-arm64 / stress / markdownlint-cli2",
+            "value": 624.46,
+            "range": "12.21",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 614.95, \"max_ms\": 638.23, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/benchmark/stress/**/*.md\"}"
+          },
+          {
+            "name": "linux-arm64 / stress / rumdl check",
+            "value": 4.84,
+            "range": "0.05",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 4.79, \"max_ms\": 4.89, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "linux-arm64 / stress / pymarkdown scan",
+            "value": 187.13,
+            "range": "3.11",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 183.8, \"max_ms\": 189.96, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "linux-x64 / medium / mdmend lint",
+            "value": 3.87,
+            "range": "0.18",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.67, \"max_ms\": 4.03, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-x64 / medium / mdmend fix",
+            "value": 8.86,
+            "range": "1.04",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 7.84, \"max_ms\": 9.91, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-x64 / medium / markdownlint-cli2",
+            "value": 777.96,
+            "range": "1.85",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 776.68, \"max_ms\": 780.08, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/**/*.md\"}"
+          },
+          {
+            "name": "linux-x64 / medium / rumdl check",
+            "value": 11.73,
+            "range": "0.07",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 11.65, \"max_ms\": 11.78, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "linux-x64 / medium / pymarkdown scan",
+            "value": 226.8,
+            "range": "1.61",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 225.53, \"max_ms\": 228.62, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "linux-x64 / small / mdmend lint",
+            "value": 3.11,
+            "range": "0.14",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.01, \"max_ms\": 3.28, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata/corpus --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-x64 / small / mdmend fix",
+            "value": 3.48,
+            "range": "0.07",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.43, \"max_ms\": 3.56, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata/corpus --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-x64 / small / markdownlint-cli2",
+            "value": 752.66,
+            "range": "2.5",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 750.03, \"max_ms\": 755.01, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/corpus/**/*.md\"}"
+          },
+          {
+            "name": "linux-x64 / small / rumdl check",
+            "value": 9.85,
+            "range": "1.15",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 8.88, \"max_ms\": 11.12, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "linux-x64 / small / pymarkdown scan",
+            "value": 235.75,
+            "range": "3.34",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 231.93, \"max_ms\": 238.16, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "linux-x64 / stress / mdmend lint",
+            "value": 3.12,
+            "range": "0.16",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 2.99, \"max_ms\": 3.3, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend lint /home/runner/work/mdmend/mdmend/testdata/benchmark/stress --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-x64 / stress / mdmend fix",
+            "value": 3.14,
+            "range": "0.08",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.07, \"max_ms\": 3.22, \"command\": \"/home/runner/work/mdmend/mdmend/mdmend fix /home/runner/work/mdmend/mdmend/testdata/benchmark/stress --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "linux-x64 / stress / markdownlint-cli2",
+            "value": 683.1,
+            "range": "9.67",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 677.47, \"max_ms\": 694.26, \"command\": \"npx --yes markdownlint-cli2 /home/runner/work/mdmend/mdmend/testdata/benchmark/stress/**/*.md\"}"
+          },
+          {
+            "name": "linux-x64 / stress / rumdl check",
+            "value": 5,
+            "range": "0.09",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 4.92, \"max_ms\": 5.1, \"command\": \"rumdl check /home/runner/work/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "linux-x64 / stress / pymarkdown scan",
+            "value": 224.2,
+            "range": "1.72",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 222.31, \"max_ms\": 225.69, \"command\": \"pymarkdown scan /home/runner/work/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "macos-arm64 / medium / mdmend lint",
+            "value": 4.08,
+            "range": "0.1",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.98, \"max_ms\": 4.18, \"command\": \"/Users/runner/work/mdmend/mdmend/mdmend lint /Users/runner/work/mdmend/mdmend/testdata --quiet --exit-zero\"}"
+          },
+          {
+            "name": "macos-arm64 / medium / mdmend fix",
+            "value": 7.12,
+            "range": "0.59",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 6.45, \"max_ms\": 7.51, \"command\": \"/Users/runner/work/mdmend/mdmend/mdmend fix /Users/runner/work/mdmend/mdmend/testdata --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "macos-arm64 / medium / markdownlint-cli2",
+            "value": 614.6,
+            "range": "98.13",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 557.56, \"max_ms\": 727.91, \"command\": \"npx --yes markdownlint-cli2 /Users/runner/work/mdmend/mdmend/testdata/**/*.md\"}"
+          },
+          {
+            "name": "macos-arm64 / medium / rumdl check",
+            "value": 17.22,
+            "range": "0.79",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 16.34, \"max_ms\": 17.86, \"command\": \"rumdl check /Users/runner/work/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "macos-arm64 / medium / pymarkdown scan",
+            "value": 174.88,
+            "range": "7.74",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 165.97, \"max_ms\": 180.0, \"command\": \"pymarkdown scan /Users/runner/work/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "macos-arm64 / small / mdmend lint",
+            "value": 3.87,
+            "range": "0.47",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.36, \"max_ms\": 4.28, \"command\": \"/Users/runner/work/mdmend/mdmend/mdmend lint /Users/runner/work/mdmend/mdmend/testdata/corpus --quiet --exit-zero\"}"
+          },
+          {
+            "name": "macos-arm64 / small / mdmend fix",
+            "value": 7.57,
+            "range": "5.12",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 4.57, \"max_ms\": 13.48, \"command\": \"/Users/runner/work/mdmend/mdmend/mdmend fix /Users/runner/work/mdmend/mdmend/testdata/corpus --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "macos-arm64 / small / markdownlint-cli2",
+            "value": 607.28,
+            "range": "28.91",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 578.11, \"max_ms\": 635.94, \"command\": \"npx --yes markdownlint-cli2 /Users/runner/work/mdmend/mdmend/testdata/corpus/**/*.md\"}"
+          },
+          {
+            "name": "macos-arm64 / small / rumdl check",
+            "value": 9.16,
+            "range": "1.01",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 8.27, \"max_ms\": 10.26, \"command\": \"rumdl check /Users/runner/work/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "macos-arm64 / small / pymarkdown scan",
+            "value": 145.79,
+            "range": "15.82",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 129.77, \"max_ms\": 161.41, \"command\": \"pymarkdown scan /Users/runner/work/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "macos-arm64 / stress / mdmend lint",
+            "value": 4.4,
+            "range": "0.44",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.9, \"max_ms\": 4.67, \"command\": \"/Users/runner/work/mdmend/mdmend/mdmend lint /Users/runner/work/mdmend/mdmend/testdata/benchmark/stress --quiet --exit-zero\"}"
+          },
+          {
+            "name": "macos-arm64 / stress / mdmend fix",
+            "value": 4.9,
+            "range": "0.91",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 3.92, \"max_ms\": 5.72, \"command\": \"/Users/runner/work/mdmend/mdmend/mdmend fix /Users/runner/work/mdmend/mdmend/testdata/benchmark/stress --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "macos-arm64 / stress / markdownlint-cli2",
+            "value": 608.92,
+            "range": "52.04",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 551.52, \"max_ms\": 653.01, \"command\": \"npx --yes markdownlint-cli2 /Users/runner/work/mdmend/mdmend/testdata/benchmark/stress/**/*.md\"}"
+          },
+          {
+            "name": "macos-arm64 / stress / rumdl check",
+            "value": 9.5,
+            "range": "0.05",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 9.44, \"max_ms\": 9.54, \"command\": \"rumdl check /Users/runner/work/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "macos-arm64 / stress / pymarkdown scan",
+            "value": 192.98,
+            "range": "28.67",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 176.14, \"max_ms\": 226.08, \"command\": \"pymarkdown scan /Users/runner/work/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "windows-x64 / medium / mdmend lint",
+            "value": 0.57,
+            "range": "0.29",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 0.27, \"max_ms\": 0.85, \"command\": \"D:/a/mdmend/mdmend/mdmend lint /d/a/mdmend/mdmend/testdata --quiet --exit-zero\"}"
+          },
+          {
+            "name": "windows-x64 / medium / mdmend fix",
+            "value": 0.57,
+            "range": "0.06",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 0.51, \"max_ms\": 0.63, \"command\": \"D:/a/mdmend/mdmend/mdmend fix /d/a/mdmend/mdmend/testdata --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "windows-x64 / medium / markdownlint-cli2",
+            "value": 1237.1,
+            "range": "55.38",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 1185.36, \"max_ms\": 1295.51, \"command\": \"npx --yes markdownlint-cli2 /d/a/mdmend/mdmend/testdata/**/*.md\"}"
+          },
+          {
+            "name": "windows-x64 / medium / rumdl check",
+            "value": 17.76,
+            "range": "3.06",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 15.24, \"max_ms\": 21.16, \"command\": \"rumdl check /d/a/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "windows-x64 / medium / pymarkdown scan",
+            "value": 236.61,
+            "range": "2.32",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 234.25, \"max_ms\": 238.89, \"command\": \"pymarkdown scan /d/a/mdmend/mdmend/testdata\"}"
+          },
+          {
+            "name": "windows-x64 / small / mdmend lint",
+            "value": 0.79,
+            "range": "0.23",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 0.58, \"max_ms\": 1.04, \"command\": \"D:/a/mdmend/mdmend/mdmend lint /d/a/mdmend/mdmend/testdata/corpus --quiet --exit-zero\"}"
+          },
+          {
+            "name": "windows-x64 / small / mdmend fix",
+            "value": 0.64,
+            "range": "0.12",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 0.53, \"max_ms\": 0.78, \"command\": \"D:/a/mdmend/mdmend/mdmend fix /d/a/mdmend/mdmend/testdata/corpus --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "windows-x64 / small / markdownlint-cli2",
+            "value": 1217.89,
+            "range": "12.41",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 1204.65, \"max_ms\": 1229.24, \"command\": \"npx --yes markdownlint-cli2 /d/a/mdmend/mdmend/testdata/corpus/**/*.md\"}"
+          },
+          {
+            "name": "windows-x64 / small / rumdl check",
+            "value": 15.62,
+            "range": "0.35",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 15.32, \"max_ms\": 16.0, \"command\": \"rumdl check /d/a/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "windows-x64 / small / pymarkdown scan",
+            "value": 248.91,
+            "range": "3.68",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 246.03, \"max_ms\": 253.05, \"command\": \"pymarkdown scan /d/a/mdmend/mdmend/testdata/corpus\"}"
+          },
+          {
+            "name": "windows-x64 / stress / mdmend lint",
+            "value": 0.89,
+            "range": "0.23",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 0.64, \"max_ms\": 1.08, \"command\": \"D:/a/mdmend/mdmend/mdmend lint /d/a/mdmend/mdmend/testdata/benchmark/stress --quiet --exit-zero\"}"
+          },
+          {
+            "name": "windows-x64 / stress / mdmend fix",
+            "value": 0.44,
+            "range": "0.12",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 0.3, \"max_ms\": 0.51, \"command\": \"D:/a/mdmend/mdmend/mdmend fix /d/a/mdmend/mdmend/testdata/benchmark/stress --dry-run --quiet --exit-zero\"}"
+          },
+          {
+            "name": "windows-x64 / stress / markdownlint-cli2",
+            "value": 1266.38,
+            "range": "29.29",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 1233.06, \"max_ms\": 1288.06, \"command\": \"npx --yes markdownlint-cli2 /d/a/mdmend/mdmend/testdata/benchmark/stress/**/*.md\"}"
+          },
+          {
+            "name": "windows-x64 / stress / rumdl check",
+            "value": 15.98,
+            "range": "0.46",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 15.63, \"max_ms\": 16.5, \"command\": \"rumdl check /d/a/mdmend/mdmend/testdata/benchmark/stress\"}"
+          },
+          {
+            "name": "windows-x64 / stress / pymarkdown scan",
+            "value": 245.07,
+            "range": "4.21",
+            "unit": "ms",
+            "extra": "{\"min_ms\": 241.98, \"max_ms\": 249.86, \"command\": \"pymarkdown scan /d/a/mdmend/mdmend/testdata/benchmark/stress\"}"
           }
         ]
       }
