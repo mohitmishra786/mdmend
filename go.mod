@@ -3,7 +3,7 @@ module github.com/mohitmishra786/mdmend
 go 1.25.0
 
 require (
-	github.com/bmatcuk/doublestar/v4 v4.10.0
+	github.com/bmatcuk/doublestar/v4 v4.10.2
 	github.com/fatih/color v1.19.0
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/pmezard/go-difflib v1.0.0
